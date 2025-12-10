@@ -10,21 +10,11 @@
  * - Load Cloudron API credentials from environment
  * - Validate connection on startup
  */
-
-import {
-  Server,
-} from '@modelcontextprotocol/sdk/server/index.js';
-import {
-  StdioServerTransport,
-} from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { Server, } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport, } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema, } from '@modelcontextprotocol/sdk/types.js';
 import { CloudronClient } from './cloudron-client.js';
-import type { CloudronConfig } from './types.js';
 import { toMCPErrorMessage } from './errors.js';
-
 // TODO: Initialize Cloudron client from environment variables
 // const config: CloudronConfig = {
 //   baseUrl: process.env.CLOUDRON_BASE_URL!,
@@ -34,7 +24,6 @@ import { toMCPErrorMessage } from './errors.js';
 // };
 //
 // const client = new CloudronClient(config);
-
 // TODO: Create MCP server instance
 // const server = new Server({
 //   name: 'cloudron-mcp',
@@ -44,7 +33,6 @@ import { toMCPErrorMessage } from './errors.js';
 //     tools: {},
 //   },
 // });
-
 // TODO: Register ListTools handler
 // server.setRequestHandler(ListToolsRequestSchema, async () => {
 //   return {
@@ -56,7 +44,6 @@ import { toMCPErrorMessage } from './errors.js';
 //     ],
 //   };
 // });
-
 // TODO: Register CallTool handler
 // server.setRequestHandler(CallToolRequestSchema, async (request) => {
 //   try {
@@ -72,7 +59,6 @@ import { toMCPErrorMessage } from './errors.js';
 //     };
 //   }
 // });
-
 // TODO: Connect to stdio transport and start server
 // async function main() {
 //   try {
@@ -93,8 +79,7 @@ import { toMCPErrorMessage } from './errors.js';
 //   console.error('Unexpected error:', error);
 //   process.exit(1);
 // });
-
 export { CloudronClient };
-export type { CloudronConfig };
 export * from './types.js';
 export * from './errors.js';
+//# sourceMappingURL=index.js.map

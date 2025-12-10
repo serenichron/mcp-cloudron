@@ -1,124 +1,105 @@
 # Cloudron MCP Project State
 
-**Last Updated**: 2025-12-10 08:31 UTC
-**Phase**: 1 (Research & Architecture) - COMPLETE
-**Next Phase**: 2 (Implementation)
+**Last Updated**: 2025-12-11
+**Phase**: 2.1 (MVP Implementation)
+**Status**: Foundation Complete - Ready for Implementation Phase
 
-## Current Status
+## Phase 2.1 MVP Completion (2025-12-11)
 
-**Completed**:
-✅ Project initialized at /home/blackthorne/Work/cloudron
-✅ TypeScript + MCP SDK environment configured
-✅ Cloudron API research complete (Serena: cloudron_api_research)
-✅ MCP protocol research complete (Serena: mcp_protocol_research)
-✅ Architecture designed (Serena: cloudron_mcp_architecture)
-✅ Asana task created (Project: MCP Testing Archive, Task: 1212372677339307)
+### Files Created
+1. ✅ `src/types.ts` - Core type definitions
+   - App interface (id, name, manifest, location, status, memory, createdAt)
+   - SystemStatus interface (version, uptime, diskUsage, memoryUsage, health)
+   - Domain interface (id, domain, provider, status, lastSync)
+   - CloudronConfig interface (baseUrl, token, timeout, retryAttempts)
+   - MCP I/O types (ListAppsInput/Output, GetStatusInput/Output, RestartAppInput/Output)
 
-**In Progress**:
-🔄 Creating agent definitions for SuperClaude framework
+2. ✅ `src/errors.ts` - Error handling system
+   - CloudronError base class with context logging
+   - CloudronAuthError (401)
+   - CloudronPermissionError (403)
+   - CloudronNotFoundError (404)
+   - CloudronAPIError (general)
+   - CloudronRateLimitError (429)
+   - CloudronConfigError (validation)
+   - createCloudronError() mapper function
+   - toMCPErrorMessage() for safe error responses
 
-**Pending**:
-⏳ Link to serenichron content pipeline
-⏳ Begin Phase 2 implementation
+3. ✅ `src/cloudron-client.ts` - API client skeleton
+   - CloudronClient class with configuration validation
+   - Constructor validates baseUrl and token
+   - Private fetchWithRetry() with exponential backoff (stub)
+   - listApps() returns empty array (stub)
+   - getStatus() returns default status (stub)
+   - restartApp() placeholder (stub)
+   - validateConnection() for startup verification
 
-## Directory Structure
+4. ✅ `src/index.ts` - MCP server skeleton
+   - Imports from @modelcontextprotocol/sdk
+   - Comprehensive TODO comments for implementation
+   - Environment variable loading scaffolding
+   - Server initialization pattern documented
+   - ListTools handler template
+   - CallTool handler template
+   - Connection validation pattern
+   - Error handling integration
+   - Exports for types, client, errors
 
-```
-/home/blackthorne/Work/cloudron/
-├── src/
-│   └── index.ts (placeholder)
-├── package.json (Node.js project)
-├── tsconfig.json (TypeScript config)
-├── node_modules/ (dependencies installed)
-└── tmp/ (temporary files)
-```
+### Architecture Adherence
+✅ Follows MCP SDK patterns from architecture memory
+✅ TypeScript strict mode enabled
+✅ JSDoc comments on all public APIs
+✅ Minimal implementations (stubs with TODOs)
+✅ Proper error class hierarchy
+✅ Configuration validation at initialization
+✅ Safe error message mapping for MCP responses
 
-## Dependencies Installed
+### MAGI Consensus Applied
+✅ 3-tool MVP approach (list_apps, get_status, restart_app)
+✅ Pragmatic: Focus on core functionality first
+✅ Strategic: Foundation designed for Phase 3 expansion
+✅ Empathetic: Comprehensive error handling prevents debug headaches
 
-- typescript, @types/node, tsx (dev)
-- @modelcontextprotocol/sdk (production)
+## Next Steps (Phase 2.2)
 
-## Serena Memories Created
+1. **Implement MCP Server Initialization**
+   - Uncomment and test main() function
+   - Load environment variables (CLOUDRON_BASE_URL, CLOUDRON_API_TOKEN)
+   - Create MCP server instance
+   - Add ListTools and CallTool handlers
 
-1. **cloudron_api_research**: Authentication, endpoints, HTTP conventions, integration points
-2. **mcp_protocol_research**: Protocol fundamentals, architecture, security, best practices
-3. **cloudron_mcp_architecture**: Complete design (20 tools, 5 categories, testing strategy)
-4. **cloudron_project_state**: This file (living reference)
+2. **Implement 3 Core Tools**
+   - cloudron_list_apps tool definition and handler
+   - cloudron_get_status tool definition and handler
+   - cloudron_restart_app tool definition and handler
 
-## Asana Integration
+3. **Implement CloudronClient Methods**
+   - Implement actual fetchWithRetry with real fetch calls
+   - Implement listApps() with /api/v1/apps endpoint
+   - Implement getStatus() with /api/v1/cloudron/status endpoint
+   - Implement restartApp() with /api/v1/apps/{id}/restart endpoint
 
-**Workspace**: Serenichron (752343194286639)
-**Project**: MCP Testing Archive (1211942423948875)
-**Task**: Cloudron MCP Server - Project Initialization (1212372677339307)
-**Assignee**: Vlad Tudorie
-**Status**: Recently assigned
-**URL**: https://app.asana.com/1/752343194286639/project/1211942423948875/task/1212372677339307
+4. **Testing**
+   - Unit tests for error classes
+   - Unit tests for CloudronClient configuration
+   - Integration tests against mock Cloudron instance
+   - MCP protocol compliance tests
 
-## Architecture Summary
+## Configuration Checklist
+- [ ] Cloudron instance available for testing
+- [ ] API token obtained with read/write permissions
+- [ ] Environment variables documented for users
+- [ ] Timeout/retry parameters tuned
 
-**Server Pattern**: TypeScript MCP with stdio transport
-**Tool Categories**: 5 (Apps, Domains, Users, System, Backups)
-**Total Tools**: 20 planned
-**Integration**: Docker MCP Gateway → SuperClaude agents
-**Deployment**: Open source (GitHub + npm)
+## Known Stubs
+- CloudronClient.fetchWithRetry() - needs real fetch implementation
+- CloudronClient.listApps() - returns empty array
+- CloudronClient.getStatus() - returns default values
+- CloudronClient.restartApp() - no-op placeholder
+- index.ts main() - all commented out, ready to uncomment
 
-## Next Actions (Phase 2)
-
-1. Implement CloudronClient wrapper:
-   - Authentication + retry logic
-   - 5 core endpoints (listApps, installApp, restartApp, getStatus, listBackups)
-   
-2. Create MCP server scaffold:
-   - Server initialization with stdio transport
-   - Tool registration system
-   - Request routing
-   
-3. Implement 3 core tools:
-   - cloudron_list_apps
-   - cloudron_install_app
-   - cloudron_status
-   
-4. Add error handling:
-   - Error category classes
-   - MCP error mapping
-   - Comprehensive logging
-   
-5. Write unit tests:
-   - Mock API responses
-   - Test error paths
-   - Validate schemas
-
-## Agent Framework Tasks
-
-**Pending Creation**:
-- Agent definition: ~/.claude/agents/mcp-specialists/cloudron.md
-- Skills: cloudron-app-deployment, cloudron-domain-setup, cloudron-backup-restore
-- Hooks: PreToolUse, PostToolUse, OnError
-
-## Content Pipeline (Serenichron)
-
-**Pending Documentation**:
-- Tutorial: "Setting up Cloudron MCP with SuperClaude"
-- Guide: "Top 10 Cloudron automation workflows"
-- Blog: "Automating Cloudron with AI: An MCP Integration"
-
-## Session Context
-
-**Environment**: Linux 6.12.58-1-lts
-**Working Directory**: /home/blackthorne/Work/cloudron
-**Git Status**: Clean (no commits yet, no remote)
-**Serena Project**: Activated (TypeScript, UTF-8)
-
-## Success Criteria (Phase 1) ✅
-
-- [x] Comprehensive API research documented
-- [x] MCP protocol understanding established
-- [x] Complete architecture designed
-- [x] Project structure initialized
-- [x] Dependencies installed
-- [x] Asana integration complete
-- [x] Serena memories created
-
-## Checkpoint
-
-Ready to proceed to Phase 2 (Implementation). All research and planning artifacts are stored in Serena. Asana task tracks progress. Project structure is ready for code development.
+## Technical Debt
+- No logging infrastructure yet (planned for Phase 3)
+- No metrics/observability (planned for Phase 3)
+- No caching layer (planned for Phase 3)
+- Tool schemas not yet defined (implement in Phase 2.2)
