@@ -2,7 +2,7 @@
  * Integration Test for CloudronClient
  * Tests against real Cloudron instance
  */
-import { CloudronClient, CloudronError, isCloudronError } from './index';
+import { CloudronClient, CloudronError, isCloudronError } from './index.js';
 async function runTests() {
     console.log('=== Cloudron MCP Client Integration Test ===\n');
     // Check environment variables
@@ -27,7 +27,8 @@ async function runTests() {
         const apps = await client.listApps();
         console.log(`✅ Found ${apps.length} apps:`);
         for (const app of apps.slice(0, 5)) { // Show first 5
-            console.log(`   - ${app.manifest.title} (${app.location}.${app.domain})`);
+            const fqdn = app.location ? `${app.location}.${app.domain}` : app.domain;
+            console.log(`   - ${app.manifest.title} (${fqdn})`);
             console.log(`     State: ${app.installationState}, Health: ${app.health}`);
         }
         if (apps.length > 5) {
@@ -39,6 +40,9 @@ async function runTests() {
         // Test 2: Get Single App (if we have any apps)
         if (apps.length > 0) {
             const firstApp = apps[0];
+            if (!firstApp) {
+                throw new Error('First app is undefined');
+            }
             console.log(`--- Test 2: getApp('${firstApp.id}') ---`);
             const app = await client.getApp(firstApp.id);
             console.log(`✅ Retrieved app: ${app.manifest.title}`);

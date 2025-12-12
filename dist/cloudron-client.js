@@ -3,7 +3,7 @@
  * MVP scope: listApps + getApp endpoints
  * DI-enabled for testing
  */
-import { CloudronError, CloudronAuthError, createErrorFromStatus } from './errors';
+import { CloudronError, CloudronAuthError, createErrorFromStatus } from './errors.js';
 const DEFAULT_TIMEOUT = 30000;
 export class CloudronClient {
     baseUrl;
@@ -89,13 +89,21 @@ export class CloudronClient {
     /**
      * Get a specific app by ID
      * GET /api/v1/apps/:appId
+     *
+     * Note: API returns app object directly, not wrapped in { app: {...} }
      */
     async getApp(appId) {
         if (!appId) {
             throw new CloudronError('appId is required');
         }
-        const response = await this.makeRequest('GET', `/api/v1/apps/${encodeURIComponent(appId)}`);
-        return response.app;
+        return await this.makeRequest('GET', `/api/v1/apps/${encodeURIComponent(appId)}`);
+    }
+    /**
+     * Get Cloudron system status
+     * GET /api/v1/cloudron/status
+     */
+    async getStatus() {
+        return await this.makeRequest('GET', '/api/v1/cloudron/status');
     }
 }
 //# sourceMappingURL=cloudron-client.js.map
