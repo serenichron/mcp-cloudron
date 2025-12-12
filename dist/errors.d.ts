@@ -1,80 +1,31 @@
 /**
- * Cloudron MCP Server Error Handling
- * Custom error classes and MCP error mapping utilities
+ * Cloudron Error Classes
+ * MVP scope: Base error + Auth error only
  */
-/**
- * Base error class for all Cloudron-related errors
- */
+/** Base error for all Cloudron API errors */
 export declare class CloudronError extends Error {
-    statusCode: number;
-    context?: Record<string, unknown> | undefined;
+    readonly statusCode: number | undefined;
+    readonly code: string | undefined;
+    constructor(message: string, statusCode?: number, code?: string);
     /**
-     * Creates a CloudronError
-     * @param message - Error description
-     * @param statusCode - HTTP status code (if applicable)
-     * @param context - Additional error context for debugging
+     * Check if error is retryable (for future Phase 3)
+     * 429 (rate limit) and 5xx errors are retryable
+     * 4xx errors (except 429) are NOT retryable
      */
-    constructor(message: string, statusCode?: number, context?: Record<string, unknown> | undefined);
-    /**
-     * Convert error to JSON for logging
-     */
-    toJSON(): {
-        name: string;
-        message: string;
-        statusCode: number;
-        context: Record<string, unknown> | undefined;
-    };
+    isRetryable(): boolean;
 }
-/**
- * Error for authentication failures (401)
- */
+/** Authentication/Authorization error (401/403) */
 export declare class CloudronAuthError extends CloudronError {
-    constructor(message?: string, context?: Record<string, unknown>);
+    constructor(message?: string, statusCode?: number);
 }
 /**
- * Error for permission denied (403)
+ * Type guard for CloudronError
+ * Usage: if (isCloudronError(error)) { ... }
  */
-export declare class CloudronPermissionError extends CloudronError {
-    constructor(message?: string, context?: Record<string, unknown>);
-}
+export declare function isCloudronError(error: unknown): error is CloudronError;
 /**
- * Error for resource not found (404)
+ * Create appropriate error from HTTP status code
+ * Routes 401/403 to CloudronAuthError, others to CloudronError
  */
-export declare class CloudronNotFoundError extends CloudronError {
-    constructor(message?: string, context?: Record<string, unknown>);
-}
-/**
- * Error for API errors and other issues
- */
-export declare class CloudronAPIError extends CloudronError {
-    constructor(message?: string, statusCode?: number, context?: Record<string, unknown>);
-}
-/**
- * Error for rate limiting (429)
- */
-export declare class CloudronRateLimitError extends CloudronError {
-    retryAfter?: number | undefined;
-    constructor(message?: string, retryAfter?: number | undefined, context?: Record<string, unknown>);
-}
-/**
- * Error for configuration issues
- */
-export declare class CloudronConfigError extends CloudronError {
-    constructor(message?: string, context?: Record<string, unknown>);
-}
-/**
- * Maps Cloudron error responses to appropriate error classes
- * @param statusCode - HTTP status code from Cloudron API
- * @param message - Error message from Cloudron API or network error
- * @param data - Full response data (if available)
- * @returns Appropriate CloudronError subclass instance
- */
-export declare function createCloudronError(statusCode: number, message: string, data?: Record<string, unknown>): CloudronError;
-/**
- * Converts CloudronError to MCP-compatible error response
- * Ensures no sensitive information (tokens, internal paths) leaks
- * @param error - The error to convert
- * @returns Safe error message for MCP response
- */
-export declare function toMCPErrorMessage(error: unknown): string;
+export declare function createErrorFromStatus(statusCode: number, message: string): CloudronError;
 //# sourceMappingURL=errors.d.ts.map

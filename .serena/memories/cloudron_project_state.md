@@ -1,105 +1,160 @@
 # Cloudron MCP Project State
 
-**Last Updated**: 2025-12-11
-**Phase**: 2.1 (MVP Implementation)
-**Status**: Foundation Complete - Ready for Implementation Phase
+**Last Updated**: 2025-12-12
+**Current Phase**: 2 (Implementation - MAGI Planning Complete)
+**Status**: Ready for parallel execution
 
-## Phase 2.1 MVP Completion (2025-12-11)
+## Project Context
 
-### Files Created
-1. ✅ `src/types.ts` - Core type definitions
-   - App interface (id, name, manifest, location, status, memory, createdAt)
-   - SystemStatus interface (version, uptime, diskUsage, memoryUsage, health)
-   - Domain interface (id, domain, provider, status, lastSync)
-   - CloudronConfig interface (baseUrl, token, timeout, retryAttempts)
-   - MCP I/O types (ListAppsInput/Output, GetStatusInput/Output, RestartAppInput/Output)
+**Purpose**: Build MCP server for Cloudron instance management
+**Integration**: SuperClaude framework via Docker MCP Gateway
+**Location**: `/home/blackthorne/Work/cloudron`
 
-2. ✅ `src/errors.ts` - Error handling system
-   - CloudronError base class with context logging
-   - CloudronAuthError (401)
-   - CloudronPermissionError (403)
-   - CloudronNotFoundError (404)
-   - CloudronAPIError (general)
-   - CloudronRateLimitError (429)
-   - CloudronConfigError (validation)
-   - createCloudronError() mapper function
-   - toMCPErrorMessage() for safe error responses
+## Phase History
 
-3. ✅ `src/cloudron-client.ts` - API client skeleton
-   - CloudronClient class with configuration validation
-   - Constructor validates baseUrl and token
-   - Private fetchWithRetry() with exponential backoff (stub)
-   - listApps() returns empty array (stub)
-   - getStatus() returns default status (stub)
-   - restartApp() placeholder (stub)
-   - validateConnection() for startup verification
+### Phase 1: Research & Architecture ✅ Complete
+- Cloudron API research (Serena: `cloudron_api_research`)
+- Architecture design (Serena: `cloudron_mcp_architecture`)
+- Initial plan creation (`~/.claude/plans/abundant-toasting-diffie.md`)
 
-4. ✅ `src/index.ts` - MCP server skeleton
-   - Imports from @modelcontextprotocol/sdk
-   - Comprehensive TODO comments for implementation
-   - Environment variable loading scaffolding
-   - Server initialization pattern documented
-   - ListTools handler template
-   - CallTool handler template
-   - Connection validation pattern
-   - Error handling integration
-   - Exports for types, client, errors
+### Phase 2: MAGI Strategic Planning ✅ Complete (2025-12-12)
 
-### Architecture Adherence
-✅ Follows MCP SDK patterns from architecture memory
-✅ TypeScript strict mode enabled
-✅ JSDoc comments on all public APIs
-✅ Minimal implementations (stubs with TODOs)
-✅ Proper error class hierarchy
-✅ Configuration validation at initialization
-✅ Safe error message mapping for MCP responses
+**MAGI Consultation**: ultrathink keyword triggered full triad analysis
 
-### MAGI Consensus Applied
-✅ 3-tool MVP approach (list_apps, get_status, restart_app)
-✅ Pragmatic: Focus on core functionality first
-✅ Strategic: Foundation designed for Phase 3 expansion
-✅ Empathetic: Comprehensive error handling prevents debug headaches
+**Three Perspectives**:
+1. **Melchior (Strategic)**: Architectural safeguards needed
+   - Dependency injection for testability
+   - Type system extensibility
+   - Clean Phase 3 integration surface
 
-## Next Steps (Phase 2.2)
+2. **Balthasar (Devil's Advocate)**: Critical bugs identified
+   - 🔴 Retry on mutations = duplicate restarts
+   - 🔴 Silent retry on non-transient errors
+   - 🔴 Missing rate limit header respect
 
-1. **Implement MCP Server Initialization**
-   - Uncomment and test main() function
-   - Load environment variables (CLOUDRON_BASE_URL, CLOUDRON_API_TOKEN)
-   - Create MCP server instance
-   - Add ListTools and CallTool handlers
+3. **Caspar (Pragmatic)**: Scope reduction recommended
+   - 5 endpoints → 2 (listApps + getApp)
+   - 5 error classes → 2
+   - Defer retry logic to Phase 3
 
-2. **Implement 3 Core Tools**
-   - cloudron_list_apps tool definition and handler
-   - cloudron_get_status tool definition and handler
-   - cloudron_restart_app tool definition and handler
+**Consensus**: 2.5/3 (Hybrid approach)
+- MVP scope (Caspar) + strategic foundation (Melchior) + critical fixes (Balthasar)
+- Refined plan: Serena memory `cloudron_phase2_magi_plan`
 
-3. **Implement CloudronClient Methods**
-   - Implement actual fetchWithRetry with real fetch calls
-   - Implement listApps() with /api/v1/apps endpoint
-   - Implement getStatus() with /api/v1/cloudron/status endpoint
-   - Implement restartApp() with /api/v1/apps/{id}/restart endpoint
+**Key Decisions**:
+- ✅ Reduce to 2 endpoints for PoC validation
+- ✅ Add dependency injection pattern
+- ✅ Remove retry logic (defer to Phase 3 with idempotency)
+- ✅ Proper 4xx error handling (no retry on 403/404/422)
+- ✅ Parallel execution: 3 workers for types/errors/package.json
 
-4. **Testing**
-   - Unit tests for error classes
-   - Unit tests for CloudronClient configuration
-   - Integration tests against mock Cloudron instance
-   - MCP protocol compliance tests
+**Time Estimate**: 1 hour (vs 3 hours original) - 66% reduction
 
-## Configuration Checklist
-- [ ] Cloudron instance available for testing
-- [ ] API token obtained with read/write permissions
-- [ ] Environment variables documented for users
-- [ ] Timeout/retry parameters tuned
+### Phase 2: Implementation (Next - Ready to Execute)
 
-## Known Stubs
-- CloudronClient.fetchWithRetry() - needs real fetch implementation
-- CloudronClient.listApps() - returns empty array
-- CloudronClient.getStatus() - returns default values
-- CloudronClient.restartApp() - no-op placeholder
-- index.ts main() - all commented out, ready to uncomment
+**Parallel Group 1** (3 workers simultaneously):
+- Worker A: `src/types.ts` (15 min)
+- Worker B: `src/errors.ts` (15 min)
+- Worker C: `package.json` (10 min)
 
-## Technical Debt
-- No logging infrastructure yet (planned for Phase 3)
-- No metrics/observability (planned for Phase 3)
-- No caching layer (planned for Phase 3)
-- Tool schemas not yet defined (implement in Phase 2.2)
+**Sequential Group 2** (after Group 1):
+- Worker D: `src/cloudron-client.ts` (45 min)
+- Worker E: `src/index.ts` (5 min)
+
+**Validation**: Integration test with real Cloudron instance
+
+### Phase 3: MCP Server & Integration (Future)
+
+**Scope**:
+- Add 3 remaining endpoints (install, configure, listDomains)
+- Implement retry logic with idempotency keys
+- Comprehensive error hierarchy
+- Security validations (SSRF, TLS)
+- MCP server scaffold with stdio transport
+- SuperClaude agent creation
+
+## Current Status
+
+**Ready for**: Phase 2 implementation (parallel workers)
+**Blocking**: None - MAGI planning complete
+**Next Action**: Spawn 3 parallel workers for Group 1
+
+## Key Files
+
+**Plans**:
+- Original plan: `~/.claude/plans/abundant-toasting-diffie.md`
+- MAGI refined: Serena `cloudron_phase2_magi_plan`
+
+**Research**:
+- API research: Serena `cloudron_api_research`
+- Architecture: Serena `cloudron_mcp_architecture`
+
+**Reference Patterns**:
+- Tavily client: `~/.claude/servers/tavily/src/client.ts`
+- Tavily types: `~/.claude/servers/tavily/src/types.ts`
+
+## Architecture Decisions (MAGI-Approved)
+
+**Dependency Injection Pattern**:
+```typescript
+new CloudronClient({ baseUrl, token }) // Testing
+new CloudronClient() // Production (env vars)
+```
+
+**No Retry Logic** (Phase 2):
+- Reason: Balthasar identified critical bug (retry on mutations)
+- Deferred: Phase 3 with idempotency keys
+
+**Minimal Types** (Phase 2):
+- Only interfaces needed for 2 endpoints
+- Extensibility deferred to Phase 3
+
+**2 Error Classes** (Phase 2):
+- CloudronError (base)
+- CloudronAuthError (401)
+- Remaining errors deferred to Phase 3
+
+## Success Metrics (Phase 2)
+
+- [x] MAGI consensus reached (2.5/3)
+- [ ] TypeScript compiles with strict mode
+- [ ] Can list apps from real Cloudron instance
+- [ ] Can get specific app by ID
+- [ ] No retry behavior (deferred to Phase 3)
+- [ ] Integration test passes
+
+## Parallel Execution Gains
+
+**Original Plan**: 3 hours sequential
+**MAGI Plan**: 1 hour with parallelization (66% reduction)
+
+**Parallelization Strategy**:
+- Group 1: types + errors + package.json (15 min)
+- Group 2: client + index (50 min sequential)
+
+## Risk Mitigation (From Balthasar)
+
+**Critical Fixes Applied**:
+- ✅ No retry on mutations (removed entirely)
+- ✅ Proper 4xx error handling
+- ✅ Fail fast (no silent retries)
+
+**Deferred to Phase 3**:
+- Retry-After header respect
+- Token rotation support
+- API version negotiation
+- SSRF validation
+- TLS enforcement
+
+## Next Steps
+
+1. Spawn 3 parallel workers (types, errors, package.json)
+2. Sequential worker for cloudron-client.ts
+3. Sequential worker for index.ts
+4. Integration test with real Cloudron
+5. Phase 3 planning (after PoC validation)
+
+## Contact
+
+**Project Owner**: Vlad (vlad@serenichron.com)
+**Cloudron Instance**: TBD (user has test instance)

@@ -1,11 +1,8 @@
 /**
- * Cloudron MCP Server Entry Point
- * Initializes MCP server with stdio transport and tool handlers
+ * Cloudron MCP Client
+ * MVP Phase 2 Implementation
  */
-import { CloudronClient } from './cloudron-client.js';
-import type { CloudronConfig } from './types.js';
-export { CloudronClient };
-export type { CloudronConfig };
-export * from './types.js';
-export * from './errors.js';
+export { CloudronClient } from './cloudron-client.js';
+export type { CloudronClientConfig, App, AppManifest, AppsResponse, AppResponse, } from './types.js';
+export { CloudronError, CloudronAuthError, isCloudronError, createErrorFromStatus, } from './errors.js';
 //# sourceMappingURL=index.d.ts.map
