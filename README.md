@@ -11,13 +11,13 @@ MCP server for [Cloudron](https://cloudron.io) instance management. List apps, g
 ## Installation
 
 ```bash
-npm install @anthropic/mcp-cloudron
+npm install @serenichron/mcp-cloudron
 ```
 
 Or run directly with npx:
 
 ```bash
-npx @anthropic/mcp-cloudron
+npx @serenichron/mcp-cloudron
 ```
 
 ## Configuration
@@ -46,7 +46,7 @@ Add to your Claude Desktop configuration (`claude_desktop_config.json`):
   "mcpServers": {
     "cloudron": {
       "command": "npx",
-      "args": ["@anthropic/mcp-cloudron"],
+      "args": ["@serenichron/mcp-cloudron"],
       "env": {
         "CLOUDRON_BASE_URL": "https://your-cloudron-instance.com",
         "CLOUDRON_API_TOKEN": "your-api-token"
@@ -64,7 +64,7 @@ Add to your Docker MCP config (`~/.docker/mcp/config.yaml`):
 mcpServers:
   cloudron:
     command: npx
-    args: ["@anthropic/mcp-cloudron"]
+    args: ["@serenichron/mcp-cloudron"]
     env:
       CLOUDRON_BASE_URL: "https://your-cloudron-instance.com"
       CLOUDRON_API_TOKEN: "your-api-token"
