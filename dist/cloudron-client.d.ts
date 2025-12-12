@@ -1,57 +1,31 @@
 /**
  * Cloudron API Client
- * Wraps the Cloudron REST API with authentication, retry logic, and error handling
+ * MVP scope: listApps + getApp endpoints
+ * DI-enabled for testing
  */
-import type { App, CloudronConfig, GetStatusInput, ListAppsInput, RestartAppInput, SystemStatus } from './types.js';
-/**
- * Cloudron API Client
- * Handles authentication, HTTP requests, and retry logic
- */
+import type { CloudronClientConfig, App } from './types';
 export declare class CloudronClient {
-    private baseUrl;
-    private token;
-    private timeout;
-    private retryAttempts;
-    private retryDelay;
+    private readonly baseUrl;
+    private readonly token;
     /**
-     * Creates a new Cloudron API client
-     * @param config - Client configuration
-     * @throws {CloudronConfigError} If configuration is invalid
+     * Create CloudronClient with DI support
+     * @param config - Optional config (defaults to env vars)
      */
-    constructor(config: CloudronConfig);
+    constructor(config?: Partial<CloudronClientConfig>);
     /**
-     * Makes an HTTP request to the Cloudron API with retry logic
-     * @private
-     * @param method - HTTP method (GET, POST, etc.)
-     * @param path - API endpoint path (e.g., '/api/v1/apps')
-     * @param body - Request body (optional)
-     * @returns Parsed JSON response
+     * Make HTTP request to Cloudron API
+     * NO retry logic (deferred to Phase 3 with idempotency keys)
      */
-    private fetchWithRetry;
+    private makeRequest;
     /**
-     * Lists all installed applications
-     * @param _input - List apps input (currently unused)
-     * @returns Array of installed applications
+     * List all installed apps
+     * GET /api/v1/apps
      */
-    listApps(_input: ListAppsInput): Promise<App[]>;
+    listApps(): Promise<App[]>;
     /**
-     * Gets system status and health
-     * @param _input - Get status input (currently unused)
-     * @returns Current system status
+     * Get a specific app by ID
+     * GET /api/v1/apps/:appId
      */
-    getStatus(_input: GetStatusInput): Promise<SystemStatus>;
-    /**
-     * Restarts a specific application
-     * @param input - Restart app input with appId
-     * @returns Success status
-     */
-    restartApp(input: RestartAppInput): Promise<void>;
-    /**
-     * Validates that the Cloudron instance is accessible
-     * Called during initialization to verify configuration
-     * @throws {CloudronAuthError} If token is invalid
-     * @throws {Error} If instance is unreachable
-     */
-    validateConnection(): Promise<void>;
+    getApp(appId: string): Promise<App>;
 }
 //# sourceMappingURL=cloudron-client.d.ts.map
