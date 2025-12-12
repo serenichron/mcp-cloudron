@@ -2,7 +2,7 @@
 
 **Last Updated**: 2025-12-12
 **Current Phase**: 3 (MCP Server) - COMPLETE ✅
-**Status**: Phase 3 complete, MCP server working, 3 tools available
+**Status**: Phase 3.5 complete, MCP integrated in Claude Code, specialist agent created
 
 ## Project Context
 
@@ -167,6 +167,30 @@ new CloudronClient() // Production (env vars)
 - API version negotiation
 - SSRF validation
 - TLS enforcement
+
+## Phase 3.5: Internal Testing Setup (COMPLETE)
+
+**Completed**: 2025-12-12
+
+### MCP Integration
+- Docker MCP Gateway: configured in `~/.docker/mcp/config.yaml`
+- Project config: `.mcp.json` created (gitignored)
+- All 3 tools tested and working
+
+### Specialist Agent
+- Created: `~/.claude/agents/mcp-specialists/cloudron.md`
+- Integrated with SuperClaude framework
+- Activation triggers defined
+
+### Test Results
+- `cloudron_list_apps`: ✅ 17 apps returned
+- `cloudron_get_app`: ✅ App details by ID working
+- `cloudron_get_status`: ✅ Version 9.0.13 confirmed
+
+### Ready for Internal Use
+- MCP tools available in Claude Code
+- Specialist agent routable via @cloudron
+- Credentials secured (not in git)
 
 ## Next Steps (Phase 4)
 
