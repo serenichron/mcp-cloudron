@@ -1,5 +1,9 @@
 # mcp-cloudron
 
+[![npm version](https://badge.fury.io/js/%40serenichron%2Fmcp-cloudron.svg)](https://www.npmjs.com/package/@serenichron/mcp-cloudron)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![MCP](https://img.shields.io/badge/MCP-Compatible-blue.svg)](https://modelcontextprotocol.io)
+
 MCP server for [Cloudron](https://cloudron.io) instance management. List apps, get status, and manage your self-hosted applications through the Model Context Protocol.
 
 ## Features
@@ -173,6 +177,17 @@ Future versions may include:
 - [ ] User management
 - [ ] Domain configuration
 - [ ] App installation from App Store
+
+## Community
+
+- 💬 [Cloudron Forum](https://forum.cloudron.io) - Discussion and support
+- 🐛 [Issue Tracker](https://github.com/serenichron/mcp-cloudron/issues) - Report bugs
+- 💡 [Feature Requests](https://github.com/serenichron/mcp-cloudron/issues/new?labels=enhancement) - Suggest improvements
+
+### Related Projects
+
+- [Model Context Protocol](https://modelcontextprotocol.io) - MCP documentation
+- [Cloudron](https://cloudron.io) - Self-hosted app platform
 
 ## License
 
