@@ -42,6 +42,34 @@ const TOOLS = [
             required: [],
         },
     },
+    {
+        name: 'cloudron_task_status',
+        description: 'Get the status of an async operation (backup, install, restore, etc.) by task ID. Returns state (pending/running/success/error), progress (0-100%), and message.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                taskId: {
+                    type: 'string',
+                    description: 'The unique identifier of the task to check',
+                },
+            },
+            required: ['taskId'],
+        },
+    },
+    {
+        name: 'cloudron_check_storage',
+        description: 'Check available disk space before operations that create data (backup, install). Returns available/total/used disk space in MB, plus warning and critical threshold alerts.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                requiredMB: {
+                    type: 'number',
+                    description: 'Optional: Required disk space in MB. If provided, checks if available >= requiredMB',
+                },
+            },
+            required: [],
+        },
+    },
 ];
 // Create server instance
 const server = new Server({
@@ -115,6 +143,58 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   Admin URL: ${status.adminFqdn}
   Provider: ${status.provider}
   Demo Mode: ${status.isDemo}`,
+                        },
+                    ],
+                };
+            }
+            case 'cloudron_task_status': {
+                const taskId = args.taskId;
+                const taskStatus = await cloudron.getTaskStatus(taskId);
+                let statusText = `Task Status:
+  ID: ${taskStatus.id}
+  State: ${taskStatus.state}
+  Progress: ${taskStatus.progress}%
+  Message: ${taskStatus.message}`;
+                if (taskStatus.state === 'success' && taskStatus.result) {
+                    statusText += `\n  Result: ${JSON.stringify(taskStatus.result, null, 2)}`;
+                }
+                if (taskStatus.state === 'error' && taskStatus.error) {
+                    statusText += `\n  Error: ${taskStatus.error.message}`;
+                    if (taskStatus.error.code) {
+                        statusText += `\n  Error Code: ${taskStatus.error.code}`;
+                    }
+                }
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: statusText,
+                        },
+                    ],
+                };
+            }
+            case 'cloudron_check_storage': {
+                const requiredMB = args.requiredMB;
+                const storageInfo = await cloudron.checkStorage(requiredMB);
+                let statusText = `Storage Status:
+  Available: ${storageInfo.available_mb} MB
+  Total: ${storageInfo.total_mb} MB
+  Used: ${storageInfo.used_mb} MB`;
+                if (requiredMB !== undefined) {
+                    statusText += `\n  Required: ${requiredMB} MB`;
+                    statusText += `\n  Sufficient: ${storageInfo.sufficient ? 'Yes' : 'No'}`;
+                }
+                if (storageInfo.critical) {
+                    statusText += '\n  ⚠️  CRITICAL: Less than 5% disk space remaining!';
+                }
+                else if (storageInfo.warning) {
+                    statusText += '\n  ⚠️  WARNING: Less than 10% disk space remaining';
+                }
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: statusText,
                         },
                     ],
                 };
