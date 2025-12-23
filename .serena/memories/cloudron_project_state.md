@@ -1,225 +1,240 @@
-# Cloudron MCP Project State
+# Cloudron MCP Server - Project State
 
-**Last Updated**: 2025-12-12
-**Current Phase**: 3 (MCP Server) - COMPLETE ✅
-**Status**: Phase 3.5 complete, MCP integrated in Claude Code, specialist agent created
+**Project**: MCP server for Cloudron instance management  
+**Location**: `/home/blackthorne/Work/cloudron`  
+**Status**: Phase 4 COMPLETE - Open Source Release Live  
+**Last Updated**: 2025-12-23
 
-## Project Context
+## Project Overview
 
-**Purpose**: Build MCP server for Cloudron instance management
-**Integration**: SuperClaude framework via Docker MCP Gateway
-**Location**: `/home/blackthorne/Work/cloudron`
-
-## Phase History
-
-### Phase 1: Research & Architecture ✅ Complete
-- Cloudron API research (Serena: `cloudron_api_research`)
-- Architecture design (Serena: `cloudron_mcp_architecture`)
-- Initial plan creation (`~/.claude/plans/abundant-toasting-diffie.md`)
-
-### Phase 2: MAGI Strategic Planning ✅ Complete (2025-12-12)
-
-**MAGI Consultation**: ultrathink keyword triggered full triad analysis
-
-**Three Perspectives**:
-1. **Melchior (Strategic)**: Architectural safeguards needed
-   - Dependency injection for testability
-   - Type system extensibility
-   - Clean Phase 3 integration surface
-
-2. **Balthasar (Devil's Advocate)**: Critical bugs identified
-   - 🔴 Retry on mutations = duplicate restarts
-   - 🔴 Silent retry on non-transient errors
-   - 🔴 Missing rate limit header respect
-
-3. **Caspar (Pragmatic)**: Scope reduction recommended
-   - 5 endpoints → 2 (listApps + getApp)
-   - 5 error classes → 2
-   - Defer retry logic to Phase 3
-
-**Consensus**: 2.5/3 (Hybrid approach)
-- MVP scope (Caspar) + strategic foundation (Melchior) + critical fixes (Balthasar)
-- Refined plan: Serena memory `cloudron_phase2_magi_plan`
-
-**Key Decisions**:
-- ✅ Reduce to 2 endpoints for PoC validation
-- ✅ Add dependency injection pattern
-- ✅ Remove retry logic (defer to Phase 3 with idempotency)
-- ✅ Proper 4xx error handling (no retry on 403/404/422)
-- ✅ Parallel execution: 3 workers for types/errors/package.json
-
-**Time Estimate**: 1 hour (vs 3 hours original) - 66% reduction
-
-### Phase 2: Implementation ✅ Complete (2025-12-12)
-
-**Files Created**:
-- ✅ `src/types.ts` - App and Config interfaces
-- ✅ `src/errors.ts` - CloudronError and CloudronAuthError
-- ✅ `src/cloudron-client.ts` - Client implementation (2 endpoints: listApps, getApp)
-- ✅ `src/index.ts` - Export interface
-- ✅ `package.json` - Dependencies configured
-
-**Integration Test**: PASSED
-- Environment: Real Cloudron instance
-- Results: 17 apps found, 3/3 tests passed
-- Bug Fixed: getApp() response type corrected
-
-**Build Status**: TypeScript compiles with strict mode ✅
-
-### Phase 3: MCP Server & Integration ✅ Complete (2025-12-12)
-
-**Completed**:
-- ✅ MCP server implemented with stdio transport (`src/server.ts`)
-- ✅ Added `getStatus()` method to CloudronClient
-- ✅ Extended SystemStatus type with system information
-- ✅ 3 MCP tools available: cloudron_list_apps, cloudron_get_app, cloudron_get_status
-- ✅ Server tested with real Cloudron instance (17 apps returned)
-- ✅ All tool responses validated and working
-
-**Files Created/Modified**:
-- `src/server.ts` - MCP server implementation (stdio transport, tool handlers)
-- `src/types.ts` - Extended with SystemStatus interface
-- `src/cloudron-client.ts` - Added getStatus() method
-- `src/index.ts` - Exported server
-
-**MCP Tools Available**:
-1. `cloudron_list_apps` - List all installed applications
-2. `cloudron_get_app` - Get specific application by ID
-3. `cloudron_get_status` - Get Cloudron instance system status
-
-**Test Results**:
-- Server starts successfully with stdio transport
-- All 3 tools return valid responses
-- Real instance test: 17 apps listed
-- System status includes version and instance information
+TypeScript-based MCP server that enables Claude to manage Cloudron instances through three core tools:
+- `cloudron_list_apps` - List all installed applications
+- `cloudron_get_app` - Get detailed app information by ID  
+- `cloudron_get_status` - Get Cloudron instance status and configuration
 
 ## Current Status
 
-**Ready for**: npm publish and GitHub repository creation
-**Completed**: Phases 1-4 (Research, Implementation, MCP Server, Documentation)
-**Next Action**: Create GitHub repo, npm publish
+### Published Package
+- **npm**: https://www.npmjs.com/package/@serenichron/mcp-cloudron v0.1.0
+- **GitHub**: https://github.com/serenichron/mcp-cloudron
+- **License**: MIT
+- **Integration**: Claude Code via Docker MCP Gateway (npx method)
 
-### Phase 4: Open Source Release ✅ Complete (2025-12-13)
+### Phase Completion
 
-**Completed**:
-- ✅ Updated package.json with full npm metadata (keywords, author, repository, engines)
-- ✅ Created comprehensive README.md with installation, usage, and API docs
-- ✅ Added MIT LICENSE
-- ✅ Created .npmignore for clean package distribution
-- ✅ Build verified working
+✅ **Phase 1**: Research & Architecture (COMPLETE)
+- Cloudron API documentation analyzed
+- MCP protocol specifications reviewed
+- Architecture decisions documented
 
-**Package Name**: `@anthropic/mcp-cloudron` (or change to `@serenichron/mcp-cloudron`)
-**Version**: 0.1.0
+✅ **Phase 2**: Core Implementation (COMPLETE)  
+- TypeScript MCP server with 3 tools
+- Cloudron API client with authentication
+- Error handling and type definitions
 
-**Files Ready for Publish**:
-- README.md - Full documentation
-- LICENSE - MIT
-- package.json - npm metadata
-- dist/ - Compiled TypeScript
+✅ **Phase 3**: Testing & Integration (COMPLETE)
+- All 3 tools tested successfully against live Cloudron instance
+- Docker MCP Gateway integration verified
+- Claude Code integration working
 
-## Key Files
+✅ **Phase 4**: Open Source Release (COMPLETE - 2025-12-23)
+- npm package published as @serenichron/mcp-cloudron
+- GitHub repository created with full documentation
+- README.md with badges (npm, MIT, MCP)
+- LICENSE (MIT) added
+- CONTRIBUTING.md created
+- .npmignore configured
+- Asana task marked complete
+- Community announcement posted to Cloudron Forum
 
-**Plans**:
-- Original plan: `~/.claude/plans/abundant-toasting-diffie.md`
-- MAGI refined: Serena `cloudron_phase2_magi_plan`
+### Security Incident (RESOLVED)
 
-**Research**:
-- API research: Serena `cloudron_api_research`
-- Architecture: Serena `cloudron_mcp_architecture`
+**Issue**: GitGuardian detected exposed Cloudron API token in git history
+- **Token exposed**: `b12818369ddc...` (64-char hex, now rotated)
+- **Fix applied**: Used `git filter-repo --path .env --invert-paths` to clean history
+- **Result**: Clean git history pushed to GitHub, user rotated token
+- **Status**: Incident closed, new token active
 
-**Reference Patterns**:
-- Tavily client: `~/.claude/servers/tavily/src/client.ts`
-- Tavily types: `~/.claude/servers/tavily/src/types.ts`
+## Technical Stack
 
-## Architecture Decisions (MAGI-Approved)
+- **Language**: TypeScript 5.9.3 (strict mode)
+- **Runtime**: Node.js ≥18.0.0
+- **MCP SDK**: @modelcontextprotocol/sdk v1.24.3
+- **Transport**: stdio (StdioServerTransport)
+- **Build**: tsc compiler
+- **Package Manager**: npm
 
-**Dependency Injection Pattern**:
-```typescript
-new CloudronClient({ baseUrl, token }) // Testing
-new CloudronClient() // Production (env vars)
+## File Structure
+
+```
+/home/blackthorne/Work/cloudron/
+├── src/
+│   ├── server.ts          # MCP server with tool handlers
+│   ├── cloudron-client.ts # Cloudron API client
+│   ├── types.ts           # TypeScript type definitions
+│   ├── errors.ts          # Error handling
+│   └── test.ts            # Manual test script
+├── dist/                  # Compiled JavaScript (gitignored)
+├── package.json           # npm package config (@serenichron/mcp-cloudron)
+├── tsconfig.json          # TypeScript strict mode config
+├── LICENSE                # MIT license
+├── README.md              # Full documentation with badges
+├── CONTRIBUTING.md        # Contribution guidelines
+├── .npmignore             # npm publish exclusions
+├── .gitignore             # Git exclusions (.env, dist/, node_modules/)
+└── .env                   # Cloudron credentials (gitignored, cleaned from history)
 ```
 
-**No Retry Logic** (Phase 2):
-- Reason: Balthasar identified critical bug (retry on mutations)
-- Deferred: Phase 3 with idempotency keys
+## Environment Configuration
 
-**Minimal Types** (Phase 2):
-- Only interfaces needed for 2 endpoints
-- Extensibility deferred to Phase 3
+**Required Variables** (in .env or Docker MCP config):
+- `CLOUDRON_BASE_URL`: Cloudron instance URL (e.g., https://my.serenichron.agency)
+- `CLOUDRON_API_TOKEN`: API token from Cloudron Admin Panel → Settings → API Tokens
 
-**2 Error Classes** (Phase 2):
-- CloudronError (base)
-- CloudronAuthError (401)
-- Remaining errors deferred to Phase 3
+**Current Integration** (~/.docker/mcp/config.yaml):
+```yaml
+mcpServers:
+  cloudron:
+    command: npx
+    args: ["@serenichron/mcp-cloudron"]
+    env:
+      CLOUDRON_BASE_URL: "https://my.serenichron.agency"
+      CLOUDRON_API_TOKEN: "[REDACTED - User has rotated]"
+```
 
-## Success Metrics (Phase 2) - ALL COMPLETE ✅
+## MCP Tools Specification
 
-- [x] MAGI consensus reached (2.5/3)
-- [x] TypeScript compiles with strict mode
-- [x] 2 MVP endpoints implemented (listApps, getApp)
-- [x] Can list all apps from real instance (17 found)
-- [x] Can get specific app by ID
-- [x] Error handling for 401/non-200 responses
-- [x] No retry behavior (deferred to Phase 3)
-- [x] Integration test passed (3/3 tests)
+### 1. cloudron_list_apps
+**Purpose**: List all installed applications on Cloudron instance  
+**Parameters**: None  
+**Returns**: Array of apps with name, domain, ID, state, health, memory  
+**Tested**: ✅ Working (returned 6 apps from live instance)
 
-## Parallel Execution Gains
+### 2. cloudron_get_app  
+**Purpose**: Get detailed information about specific application  
+**Parameters**: `appId` (string, required)  
+**Returns**: App details including name, domain, state, health, memory  
+**Tested**: ✅ Working (retrieved Baserow app details)
 
-**Original Plan**: 3 hours sequential
-**MAGI Plan**: 1 hour with parallelization (66% reduction)
+### 3. cloudron_get_status
+**Purpose**: Get Cloudron instance status and configuration  
+**Parameters**: None  
+**Returns**: Instance name, version, admin URL, provider, demo mode  
+**Tested**: ✅ Working (returned Cloudron 9.0.13 status)
 
-**Parallelization Strategy**:
-- Group 1: types + errors + package.json (15 min)
-- Group 2: client + index (50 min sequential)
+## Cloudron API Integration
 
-## Risk Mitigation (From Balthasar)
+**Base URL**: Configured via CLOUDRON_BASE_URL environment variable  
+**Authentication**: Bearer token in Authorization header  
+**Endpoints Used**:
+- `GET /api/v1/apps` - List applications
+- `GET /api/v1/apps/:id` - Get app by ID  
+- `GET /api/v1/cloudron/status` - Get instance status
 
-**Critical Fixes Applied**:
-- ✅ No retry on mutations (removed entirely)
-- ✅ Proper 4xx error handling
-- ✅ Fail fast (no silent retries)
+**Error Handling**:
+- Network errors caught and formatted
+- API errors include status codes
+- Configuration validation on client initialization
 
-**Deferred to Phase 3**:
-- Retry-After header respect
-- Token rotation support
-- API version negotiation
-- SSRF validation
-- TLS enforcement
+## Development Workflow
 
-## Phase 3.5: Internal Testing Setup (COMPLETE)
+### Local Development
+```bash
+npm install           # Install dependencies
+npm run build         # Compile TypeScript
+npm start             # Run server (stdio)
+npm test              # Manual test against live instance
+npm run dev           # Watch mode (tsx)
+```
 
-**Completed**: 2025-12-12
+### Publishing to npm
+```bash
+npm run build                                    # Compile to dist/
+npm publish --access public                      # Publish scoped package
+# Note: Requires npm authentication (user published manually via browser due to security key 2FA)
+```
 
-### MCP Integration
-- Docker MCP Gateway: configured in `~/.docker/mcp/config.yaml`
-- Project config: `.mcp.json` created (gitignored)
-- All 3 tools tested and working
+### Git Workflow
+```bash
+git add .
+git commit -m "feat: description"               # Conventional commits
+git push origin master
+```
 
-### Specialist Agent
-- Created: `~/.claude/agents/mcp-specialists/cloudron.md`
-- Integrated with SuperClaude framework
-- Activation triggers defined
+## Community Engagement
 
-### Test Results
-- `cloudron_list_apps`: ✅ 17 apps returned
-- `cloudron_get_app`: ✅ App details by ID working
-- `cloudron_get_status`: ✅ Version 9.0.13 confirmed
+**Forum Post**: Posted to Cloudron Forum 2025-12-23
+- Announcement of MCP server availability
+- Installation instructions
+- Invitation to fork/extend/file issues
+- Links to npm package and GitHub repo
 
-### Ready for Internal Use
-- MCP tools available in Claude Code
-- Specialist agent routable via @cloudron
-- Credentials secured (not in git)
+**Community Resources**:
+- 💬 Cloudron Forum: https://forum.cloudron.io
+- 🐛 GitHub Issues: https://github.com/serenichron/mcp-cloudron/issues  
+- 💡 Feature Requests: https://github.com/serenichron/mcp-cloudron/issues/new?labels=enhancement
 
-## Next Steps (Phase 4)
+## Roadmap (Future Phases)
 
-1. Complete comprehensive documentation (README.md, API docs)
-2. Add examples and quickstart guide
-3. Publish to npm registry
-4. Create GitHub repository with CI/CD
-5. Register MCP server in marketplace (if applicable)
-6. Create SuperClaude agent wrapper
+Potential future enhancements (community-driven):
+- [ ] App lifecycle management (start, stop, restart)
+- [ ] Backup operations (create, restore, schedule)
+- [ ] User management (list, create, delete users)
+- [ ] Domain configuration (add, remove, configure domains)
+- [ ] App installation from Cloudron App Store
+- [ ] Email configuration management
+- [ ] System updates and maintenance
 
-## Contact
+## Asana Integration
 
-**Project Owner**: Vlad (vlad@serenichron.com)
-**Cloudron Instance**: TBD (user has test instance)
+**Workspace**: Serenichron (gid: 1209371498667366)  
+**Project**: Cloudron MCP Integration  
+**Task**: "Cloudron MCP Server - Full Development & Release" (gid: 1209371574206093)  
+**Status**: ✅ Marked complete (2025-12-23)
+
+## Session History
+
+**Session 1** (2025-12-10): Initial research and architecture
+- Deep research on Cloudron API and MCP protocol
+- Project initialization with Asana integration
+- Architecture decisions documented
+
+**Session 2** (2025-12-11): Core implementation
+- TypeScript MCP server built
+- 3 tools implemented and tested
+- Docker MCP Gateway integration
+
+**Session 3** (2025-12-23): Open source release
+- npm package published
+- GitHub repository created with full documentation
+- Security incident resolved (exposed token cleaned from history)
+- Community announcement posted
+- Phase 4 completed
+
+## Key Learnings
+
+1. **MCP SDK**: StdioServerTransport is straightforward for CLI integration
+2. **TypeScript Strict Mode**: Catches type errors early, improves reliability
+3. **Docker MCP Gateway**: npx method simplifies distribution (no local builds)
+4. **Security**: Never commit .env files; use git filter-repo for history cleanup
+5. **npm 2FA**: Automation tokens still require OTP if account has 2FA enabled; manual browser publish works with security keys
+6. **Community**: Open source documentation (README, CONTRIBUTING) critical for adoption
+
+## Success Metrics
+
+- ✅ All 3 MCP tools working against live Cloudron instance
+- ✅ Successfully published to npm registry
+- ✅ GitHub repository public with comprehensive documentation
+- ✅ Security incident resolved with no lingering exposed credentials
+- ✅ Community announcement posted and acknowledged
+- ✅ Claude Code integration functional via npx method
+
+## Next Steps (User-Driven)
+
+Project is in maintenance mode. Future work would be reactive based on:
+- Community feedback from Cloudron Forum
+- GitHub issues or feature requests  
+- npm adoption metrics (downloads, stars)
+- Bug reports from users
+
+**No immediate action required.**
