@@ -3,7 +3,7 @@
  * MVP scope: listApps + getApp endpoints
  * DI-enabled for testing
  */
-import type { CloudronClientConfig, App, SystemStatus } from './types.js';
+import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo } from './types.js';
 export declare class CloudronClient {
     private readonly baseUrl;
     private readonly token;
@@ -34,5 +34,17 @@ export declare class CloudronClient {
      * GET /api/v1/cloudron/status
      */
     getStatus(): Promise<SystemStatus>;
+    /**
+     * Get task status for async operations
+     * GET /api/v1/tasks/:taskId
+     */
+    getTaskStatus(taskId: string): Promise<TaskStatus>;
+    /**
+     * Check available disk space for pre-flight validation
+     * GET /api/v1/cloudron/status (reuses existing endpoint)
+     * @param requiredMB - Optional required disk space in MB
+     * @returns Storage info with availability and threshold checks
+     */
+    checkStorage(requiredMB?: number): Promise<StorageInfo>;
 }
 //# sourceMappingURL=cloudron-client.d.ts.map
