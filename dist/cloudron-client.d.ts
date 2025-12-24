@@ -3,7 +3,7 @@
  * MVP scope: listApps + getApp endpoints
  * DI-enabled for testing
  */
-import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo } from './types.js';
+import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult } from './types.js';
 export declare class CloudronClient {
     private readonly baseUrl;
     private readonly token;
@@ -46,5 +46,27 @@ export declare class CloudronClient {
      * @returns Storage info with availability and threshold checks
      */
     checkStorage(requiredMB?: number): Promise<StorageInfo>;
+    /**
+     * Validate a destructive operation before execution (pre-flight safety check)
+     * @param operation - Type of operation to validate
+     * @param resourceId - ID of the resource being operated on
+     * @returns Validation result with errors, warnings, and recommendations
+     */
+    validateOperation(operation: ValidatableOperation, resourceId: string): Promise<ValidationResult>;
+    /**
+     * Validate uninstall_app operation
+     * Checks: app exists, no dependent apps, backup exists
+     */
+    private validateUninstallApp;
+    /**
+     * Validate delete_user operation
+     * Checks: user exists, not last admin, not currently logged in
+     */
+    private validateDeleteUser;
+    /**
+     * Validate restore_backup operation
+     * Checks: backup exists, backup integrity valid, sufficient storage
+     */
+    private validateRestoreBackup;
 }
 //# sourceMappingURL=cloudron-client.d.ts.map
