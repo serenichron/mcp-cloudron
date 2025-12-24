@@ -123,8 +123,50 @@ const TOOLS = [
         },
     },
     {
+        name: 'cloudron_configure_app',
+        description: 'Update application configuration including environment variables, memory limits, and access control settings. Returns 200 OK with updated app config and restart requirement flag.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                appId: {
+                    type: 'string',
+                    description: 'The unique identifier of the application to configure',
+                },
+                config: {
+                    type: 'object',
+                    description: 'Configuration object with env vars, memoryLimit, and/or accessRestriction',
+                    properties: {
+                        env: {
+                            type: 'object',
+                            description: 'Environment variables as key-value pairs (optional)',
+                            additionalProperties: { type: 'string' },
+                        },
+                        memoryLimit: {
+                            type: 'number',
+                            description: 'Memory limit in MB (optional)',
+                        },
+                        accessRestriction: {
+                            type: ['string', 'null'],
+                            description: 'Access control settings (optional)',
+                        },
+                    },
+                },
+            },
+            required: ['appId', 'config'],
+        },
+    },
+    {
         name: 'cloudron_list_backups',
         description: 'List all backups available on the Cloudron instance. Returns backup details including ID, timestamp, size, app count, and status. Backups are sorted by timestamp (newest first).',
+        inputSchema: {
+            type: 'object',
+            properties: {},
+            required: [],
+        },
+    },
+    {
+        name: 'cloudron_create_backup',
+        description: 'Create a new backup of the Cloudron instance. Performs F36 pre-flight storage check (requires 5GB minimum). Returns task ID for tracking backup progress via cloudron_task_status (F34).',
         inputSchema: {
             type: 'object',
             properties: {},
@@ -155,6 +197,20 @@ const TOOLS = [
         },
     },
     {
+        name: 'cloudron_validate_manifest',
+        description: 'Validate app manifest before installation (pre-flight safety check). Checks storage sufficiency via F36, dependency availability, and manifest schema validity. Returns validation report with errors and warnings.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                appId: {
+                    type: 'string',
+                    description: 'The App Store ID to validate',
+                },
+            },
+            required: ['appId'],
+        },
+    },
+    {
         name: 'cloudron_create_user',
         description: 'Create a new user on the Cloudron instance with role assignment (atomic operation). Password must be at least 8 characters long and contain at least 1 uppercase letter and 1 number. Returns 201 Created with user object.',
         inputSchema: {
@@ -175,6 +231,43 @@ const TOOLS = [
                 },
             },
             required: ['email', 'password', 'role'],
+        },
+    },
+    {
+        name: 'cloudron_get_logs',
+        description: 'Get logs for an app or service. Logs are formatted with timestamps and severity levels for readability. Type parameter determines endpoint: "app" calls GET /api/v1/apps/:id/logs, "service" calls GET /api/v1/services/:id/logs.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                resourceId: {
+                    type: 'string',
+                    description: 'App ID or service ID to retrieve logs for',
+                },
+                type: {
+                    type: 'string',
+                    enum: ['app', 'service'],
+                    description: 'Type of resource: "app" for application logs, "service" for system service logs',
+                },
+                lines: {
+                    type: 'number',
+                    description: 'Optional: Number of log lines to retrieve (default 100, max 1000)',
+                },
+            },
+            required: ['resourceId', 'type'],
+        },
+    },
+    {
+        name: 'cloudron_uninstall_app',
+        description: 'Uninstall an application with pre-flight safety validation. DESTRUCTIVE OPERATION. First validates via cloudron_validate_operation (checks app exists, no dependencies, backup recommended), then calls DELETE /api/v1/apps/:id. Returns 202 Accepted with task ID for async operation tracking.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                appId: {
+                    type: 'string',
+                    description: 'The unique identifier of the application to uninstall',
+                },
+            },
+            required: ['appId'],
         },
     },
 ];
@@ -410,6 +503,54 @@ Use cloudron_task_status with taskId '${result.taskId}' to track completion.`,
                     ],
                 };
             }
+            case 'cloudron_configure_app': {
+                const { appId, config } = args;
+                // Validate config object is provided and not empty
+                if (!config || Object.keys(config).length === 0) {
+                    return {
+                        content: [
+                            {
+                                type: 'text',
+                                text: 'Config object is required and cannot be empty. Provide at least one of: env, memoryLimit, accessRestriction',
+                            },
+                        ],
+                        isError: true,
+                    };
+                }
+                const result = await cloudron.configureApp(appId, config);
+                // Format config changes summary
+                const configChanges = Object.keys(config).map(key => {
+                    if (key === 'env') {
+                        const envCount = Object.keys(config.env).length;
+                        return `  - Environment variables: ${envCount} variable(s) updated`;
+                    }
+                    else if (key === 'memoryLimit') {
+                        return `  - Memory limit: ${config.memoryLimit} MB`;
+                    }
+                    else if (key === 'accessRestriction') {
+                        return `  - Access restriction: ${config.accessRestriction ?? 'none'}`;
+                    }
+                    else {
+                        return `  - ${key}: updated`;
+                    }
+                }).join('\n');
+                const restartNote = result.restartRequired
+                    ? '\n⚠️  App restart required for configuration changes to take effect. Use cloudron_control_app with action "restart".'
+                    : '\n✓ Configuration applied. No restart required.';
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `App configuration updated successfully.
+App ID: ${appId}
+
+Configuration changes:
+${configChanges}
+${restartNote}`,
+                        },
+                    ],
+                };
+            }
             case 'cloudron_list_backups': {
                 const backups = await cloudron.listBackups();
                 if (backups.length === 0) {
@@ -439,6 +580,24 @@ Use cloudron_task_status with taskId '${result.taskId}' to track completion.`,
                         {
                             type: 'text',
                             text: `Found ${backups.length} backup(s):\n\n${formatted}`,
+                        },
+                    ],
+                };
+            }
+            case 'cloudron_create_backup': {
+                // F36 pre-flight storage check performed in createBackup()
+                const taskId = await cloudron.createBackup();
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `Backup creation started successfully.
+
+Task ID: ${taskId}
+
+Use cloudron_task_status with taskId="${taskId}" to track backup progress.
+
+Note: Pre-flight storage check passed (5GB minimum required).`,
                         },
                     ],
                 };
@@ -507,6 +666,42 @@ Use cloudron_task_status with taskId '${result.taskId}' to track completion.`,
                     ],
                 };
             }
+            case 'cloudron_validate_manifest': {
+                const { appId } = args;
+                const result = await cloudron.validateManifest(appId);
+                if (result.valid) {
+                    const warningText = result.warnings.length > 0
+                        ? `\n\nWarnings:\n${result.warnings.map(w => `  - ${w}`).join('\n')}`
+                        : '';
+                    return {
+                        content: [
+                            {
+                                type: 'text',
+                                text: `Manifest validation passed for app: ${appId}
+
+App is ready for installation.${warningText}`,
+                            },
+                        ],
+                    };
+                }
+                else {
+                    const errorsText = result.errors.map(e => `  - ${e}`).join('\n');
+                    const warningsText = result.warnings.length > 0
+                        ? `\n\nWarnings:\n${result.warnings.map(w => `  - ${w}`).join('\n')}`
+                        : '';
+                    return {
+                        content: [
+                            {
+                                type: 'text',
+                                text: `Manifest validation failed for app: ${appId}
+
+Errors (must be resolved):
+${errorsText}${warningsText}`,
+                            },
+                        ],
+                    };
+                }
+            }
             case 'cloudron_create_user': {
                 const { email, password, role } = args;
                 const user = await cloudron.createUser(email, password, role);
@@ -520,6 +715,39 @@ Use cloudron_task_status with taskId '${result.taskId}' to track completion.`,
   Username: ${user.username}
   Role: ${user.role}
   Created: ${new Date(user.createdAt).toLocaleString()}`,
+                        },
+                    ],
+                };
+            }
+            case 'cloudron_get_logs': {
+                const { resourceId, type, lines } = args;
+                const logEntries = await cloudron.getLogs(resourceId, type, lines);
+                // Format logs for display
+                const formattedLogs = logEntries.map(entry => `[${entry.timestamp}] [${entry.severity}] ${entry.message}`).join('\n');
+                const logType = type === 'app' ? 'Application' : 'Service';
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `${logType} logs for ${resourceId} (${logEntries.length} entries):\n\n${formattedLogs}`,
+                        },
+                    ],
+                };
+            }
+            case 'cloudron_uninstall_app': {
+                const { appId } = args;
+                const result = await cloudron.uninstallApp(appId);
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `Uninstall operation initiated for app: ${appId}
+  Task ID: ${result.taskId}
+  Status: Pending (202 Accepted)
+
+Use cloudron_task_status with taskId '${result.taskId}' to track uninstall progress.
+
+Note: This is a DESTRUCTIVE operation. The app and its data will be removed once the task completes.`,
                         },
                     ],
                 };

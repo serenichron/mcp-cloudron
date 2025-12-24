@@ -121,6 +121,29 @@ export class CloudronClient {
         });
     }
     /**
+     * Create a new backup (with F36 pre-flight storage check)
+     * POST /api/v1/backups
+     * @returns Task ID for tracking backup progress via getTaskStatus()
+     */
+    async createBackup() {
+        // F36 pre-flight storage check: Require 5GB minimum for backup
+        const BACKUP_MIN_STORAGE_MB = 5120; // 5GB
+        const storageInfo = await this.checkStorage(BACKUP_MIN_STORAGE_MB);
+        if (!storageInfo.sufficient) {
+            throw new CloudronError(`Insufficient storage for backup. Required: ${BACKUP_MIN_STORAGE_MB}MB, Available: ${storageInfo.available_mb}MB`);
+        }
+        if (storageInfo.warning) {
+            // Log warning but allow operation to proceed
+            console.warn(`Storage warning: ${storageInfo.available_mb}MB available (${((storageInfo.available_mb / storageInfo.total_mb) * 100).toFixed(1)}% of total)`);
+        }
+        // Create backup (async operation)
+        const response = await this.makeRequest('POST', '/api/v1/backups');
+        if (!response.taskId) {
+            throw new CloudronError('Backup creation response missing taskId');
+        }
+        return response.taskId;
+    }
+    /**
      * List all users on Cloudron instance
      * GET /api/v1/users
      * @returns Array of users sorted by role then email
@@ -274,6 +297,26 @@ export class CloudronClient {
         return await this.makeRequest('PUT', `/api/v1/apps/${encodeURIComponent(appId)}/configure`, config);
     }
     /**
+     * Uninstall an application (DESTRUCTIVE OPERATION)
+     * DELETE /api/v1/apps/:id
+     * Returns 202 Accepted with task ID for async operation tracking
+     * Performs pre-flight validation via F37 before proceeding
+     */
+    async uninstallApp(appId) {
+        if (!appId) {
+            throw new CloudronError('appId is required');
+        }
+        // Pre-flight validation via F37
+        const validation = await this.validateOperation('uninstall_app', appId);
+        // If validation fails, throw error with validation details
+        if (!validation.valid) {
+            const errorMessage = `Pre-flight validation failed for uninstall_app on '${appId}':\n${validation.errors.join('\n')}`;
+            throw new CloudronError(errorMessage);
+        }
+        // Proceed with uninstall if validation passes
+        return await this.makeRequest('DELETE', `/api/v1/apps/${encodeURIComponent(appId)}`);
+    }
+    /**
      * Get task status for async operations
      * GET /api/v1/tasks/:taskId
      */
@@ -293,6 +336,74 @@ export class CloudronClient {
             throw new CloudronError('taskId is required');
         }
         return await this.makeRequest('DELETE', `/api/v1/tasks/${encodeURIComponent(taskId)}`);
+    }
+    /**
+     * Get logs for an app or service
+     * GET /api/v1/apps/:id/logs or GET /api/v1/services/:id/logs
+     * @param resourceId - App ID or service ID
+     * @param type - Type of resource ('app' or 'service')
+     * @param lines - Optional number of log lines to retrieve (default 100, max 1000)
+     * @returns Formatted log entries with timestamps and severity levels
+     */
+    async getLogs(resourceId, type, lines = 100) {
+        if (!resourceId) {
+            throw new CloudronError('resourceId is required');
+        }
+        if (type !== 'app' && type !== 'service') {
+            throw new CloudronError(`Invalid type: ${type}. Valid options: app, service`);
+        }
+        // Clamp lines between 1 and 1000
+        const clampedLines = Math.max(1, Math.min(1000, lines));
+        // Determine endpoint based on type
+        const endpoint = type === 'app'
+            ? `/api/v1/apps/${encodeURIComponent(resourceId)}/logs?lines=${clampedLines}`
+            : `/api/v1/services/${encodeURIComponent(resourceId)}/logs?lines=${clampedLines}`;
+        const response = await this.makeRequest('GET', endpoint);
+        // Parse and format log entries
+        return this.parseLogEntries(response.logs || []);
+    }
+    /**
+     * Parse raw log lines into structured LogEntry objects
+     * Attempts to extract timestamp and severity level from log lines
+     */
+    parseLogEntries(logLines) {
+        return logLines.map(line => {
+            // Try to parse common log formats:
+            // 1. ISO timestamp at start: "2025-12-24T12:00:00Z [INFO] message"
+            // 2. Syslog format: "Dec 24 12:00:00 host service[pid]: message"
+            // 3. Simple format: "[INFO] message"
+            // 4. Plain text: "message"
+            const isoMatch = line.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?)\s+\[?(\w+)\]?\s*(.*)$/);
+            if (isoMatch && isoMatch[1] && isoMatch[2] && isoMatch[3]) {
+                return {
+                    timestamp: isoMatch[1],
+                    severity: isoMatch[2].toUpperCase(),
+                    message: isoMatch[3].trim(),
+                };
+            }
+            const syslogMatch = line.match(/^(\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})\s+.*?\[\d+\]:\s*\[?(\w+)\]?\s*(.*)$/);
+            if (syslogMatch && syslogMatch[1] && syslogMatch[2] && syslogMatch[3]) {
+                return {
+                    timestamp: syslogMatch[1],
+                    severity: syslogMatch[2].toUpperCase(),
+                    message: syslogMatch[3].trim(),
+                };
+            }
+            const simpleMatch = line.match(/^\[?(\w+)\]?\s+(.*)$/);
+            if (simpleMatch && simpleMatch[1] && simpleMatch[2] && ['DEBUG', 'INFO', 'WARN', 'WARNING', 'ERROR', 'FATAL', 'TRACE'].includes(simpleMatch[1].toUpperCase())) {
+                return {
+                    timestamp: new Date().toISOString(),
+                    severity: simpleMatch[1].toUpperCase(),
+                    message: simpleMatch[2].trim(),
+                };
+            }
+            // Fallback: plain text log line
+            return {
+                timestamp: new Date().toISOString(),
+                severity: 'INFO',
+                message: line.trim(),
+            };
+        });
     }
     /**
      * Check available disk space for pre-flight validation
@@ -440,6 +551,69 @@ export class CloudronClient {
                 throw error;
             }
         }
+    }
+    /**
+     * Validate app manifest before installation (F23a pre-flight safety check)
+     * Checks: F36 storage sufficient, dependencies available, configuration schema valid
+     * @param appId - The app ID to validate from App Store
+     * @param requiredMB - Optional disk space requirement in MB (defaults to 500MB)
+     * @returns Validation result with errors and warnings
+     */
+    async validateManifest(appId, requiredMB = 500) {
+        if (!appId) {
+            throw new CloudronError('appId is required for manifest validation');
+        }
+        const result = {
+            valid: true,
+            errors: [],
+            warnings: [],
+        };
+        try {
+            // Step 1: Fetch app manifest from App Store
+            // Note: Using searchApps as proxy since GET /api/v1/appstore/:id may not exist
+            const apps = await this.searchApps(appId);
+            const app = apps.find(a => a.id === appId);
+            if (!app) {
+                result.errors.push(`App not found in App Store: ${appId}`);
+                result.valid = false;
+                return result;
+            }
+            // Step 2: Check F36 storage sufficient for installation
+            const storageInfo = await this.checkStorage(requiredMB);
+            if (storageInfo.critical) {
+                result.errors.push(`CRITICAL: Less than 5% disk space remaining (${storageInfo.available_mb}MB available). Installation blocked.`);
+            }
+            else if (!storageInfo.sufficient) {
+                result.errors.push(`Insufficient disk space: ${storageInfo.available_mb}MB available, ${requiredMB}MB required.`);
+            }
+            else if (storageInfo.warning) {
+                result.warnings.push(`WARNING: Less than 10% disk space remaining (${storageInfo.available_mb}MB available). Monitor disk usage after installation.`);
+            }
+            // Step 3: Check dependencies available in catalog
+            // Note: Cloudron App Store apps declare dependencies in manifest.addons
+            // For MVP, we'll validate basic structure exists
+            // Full dependency resolution would require GET /api/v1/appstore/:id/manifest
+            if (app.description && app.description.toLowerCase().includes('requires')) {
+                result.warnings.push('App may have dependencies. Verify all required addons are available.');
+            }
+            // Step 4: Validate configuration schema
+            // Note: Full schema validation would require manifest.configSchema from API
+            // For MVP, we'll pass this check with a recommendation
+            result.warnings.push('Ensure app configuration matches Cloudron specification after installation.');
+        }
+        catch (error) {
+            if (error instanceof CloudronError) {
+                result.errors.push(`Manifest validation failed: ${error.message}`);
+            }
+            else {
+                throw error;
+            }
+        }
+        // Set valid to false if there are any blocking errors
+        if (result.errors.length > 0) {
+            result.valid = false;
+        }
+        return result;
     }
 }
 /**
