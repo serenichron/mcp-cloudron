@@ -3,7 +3,7 @@
  * MVP scope: listApps + getApp endpoints
  * DI-enabled for testing
  */
-import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult } from './types.js';
+import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult, Backup, AppStoreApp, User } from './types.js';
 export declare class CloudronClient {
     private readonly baseUrl;
     private readonly token;
@@ -34,6 +34,49 @@ export declare class CloudronClient {
      * GET /api/v1/cloudron/status
      */
     getStatus(): Promise<SystemStatus>;
+    /**
+     * List all backups
+     * GET /api/v1/backups
+     * @returns Array of backups sorted by timestamp (newest first)
+     */
+    listBackups(): Promise<Backup[]>;
+    /**
+     * List all users on Cloudron instance
+     * GET /api/v1/users
+     * @returns Array of users sorted by role then email
+     */
+    listUsers(): Promise<User[]>;
+    /**
+     * Search Cloudron App Store for available applications
+     * GET /api/v1/appstore?search={query}
+     * @param query - Optional search query (empty returns all apps)
+     * @returns Array of app store apps sorted by relevance score
+     */
+    searchApps(query?: string): Promise<AppStoreApp[]>;
+    /**
+     * Start an app
+     * POST /api/v1/apps/:appId/start
+     * @returns 202 Accepted response with task ID
+     */
+    startApp(appId: string): Promise<{
+        taskId: string;
+    }>;
+    /**
+     * Stop an app
+     * POST /api/v1/apps/:appId/stop
+     * @returns 202 Accepted response with task ID
+     */
+    stopApp(appId: string): Promise<{
+        taskId: string;
+    }>;
+    /**
+     * Restart an app
+     * POST /api/v1/apps/:appId/restart
+     * @returns 202 Accepted response with task ID
+     */
+    restartApp(appId: string): Promise<{
+        taskId: string;
+    }>;
     /**
      * Get task status for async operations
      * GET /api/v1/tasks/:taskId
