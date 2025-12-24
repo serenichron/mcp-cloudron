@@ -4,7 +4,7 @@
     "name": "Cloudron MCP Server - Feature Expansion (MAGI Re-Sequenced)",
     "type": "feature_development",
     "created_at": "2025-12-23T00:00:00Z",
-    "last_updated": "2025-12-24T08:48:12.378574",
+    "last_updated": "2025-12-24T12:00:00Z",
     "repository_path": "/home/blackthorne/Work/cloudron",
     "primary_language": "typescript",
     "test_framework": "jest"
@@ -674,9 +674,19 @@
         "Test cancelled tasks cleanup resources (partial backups deleted)",
         "Update README.md with cancellation documentation"
       ],
-      "status": "failing",
-      "test_status": "none",
-      "tried_count": 0,
+      "status": "passing",
+      "test_status": "passing",
+      "test_results": {
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "duration_seconds": 0.265,
+        "last_run": "2025-12-24T12:00:00Z",
+        "command": "npm test -- cloudron-cancel-task",
+        "output_summary": "All 8 tests passed for F35 cloudron_cancel_task tool. Task cancellation with DELETE API call, 404 handling, completed task validation, resource cleanup verified."
+      },
+      "git_commit": "PENDING",
+      "tried_count": 1,
       "last_error": null,
       "dependencies": [
         "F00",
@@ -1250,12 +1260,12 @@
     "phase_2_features": 20,
     "merged_features": 2,
     "not_started": 0,
-    "failing": 30,
+    "failing": 29,
     "merged": 2,
     "in_progress": 0,
-    "passing": 4,
+    "passing": 5,
     "reverted": 0,
-    "progress_percentage": "11.1"
+    "progress_percentage": "13.5"
   },
   "session_log": [
     {
@@ -1335,6 +1345,22 @@
         "013dd02fc3ed0b883e68e09ba28b4ba0b3e4f936"
       ],
       "notes": "Implemented F12 cloudron_list_users: Added User/UsersResponse interfaces, CloudronClient.listUsers() method, MCP tool handler. Users sorted by role (admin/user/guest) then email. 8 comprehensive tests passing, covering sorting, empty list, error handling, environment validation. All tests passing (80/80 total)."
+    },
+    {
+      "session_id": "session_007",
+      "started_at": "2025-12-24T11:30:00Z",
+      "ended_at": "2025-12-24T12:00:00Z",
+      "agent_type": "worker",
+      "features_attempted": [
+        "F35"
+      ],
+      "features_completed": [
+        "F35"
+      ],
+      "commits": [
+        "PENDING"
+      ],
+      "notes": "Implemented F35 cloudron_cancel_task: Added 'cancelled' state to TaskStatus type, CloudronClient.cancelTask() method with DELETE /api/v1/tasks/:id, cloudron_cancel_task MCP tool, updated task_status handler to display cancelled state. 8 comprehensive tests passing (running task cancellation, 404 handling, completed task validation, resource cleanup, HTTP method verification, endpoint validation). All 129 tests passing."
     }
   ],
   "technical_context": {
