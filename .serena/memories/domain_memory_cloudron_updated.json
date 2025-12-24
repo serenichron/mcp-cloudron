@@ -4,7 +4,7 @@
     "name": "Cloudron MCP Server - Feature Expansion (MAGI Re-Sequenced)",
     "type": "feature_development",
     "created_at": "2025-12-23T00:00:00Z",
-    "last_updated": "2025-12-24T06:30:50.111Z",
+    "last_updated": "2025-12-24T08:48:12.378574",
     "repository_path": "/home/blackthorne/Work/cloudron",
     "primary_language": "typescript",
     "test_framework": "jest"
@@ -193,7 +193,7 @@
         "Action 'restart' returns 202 Accepted and calls POST /api/v1/apps/:id/restart",
         "Invalid appId returns 404 Not Found with error message",
         "Invalid action returns 400 Bad Request with enum options listed",
-        "App state transitions verified (running→stopped, stopped→running)"
+        "App state transitions verified (running\u2192stopped, stopped\u2192running)"
       ]
     },
     {
@@ -205,8 +205,8 @@
         "Define tool schema in server.ts with appId parameter",
         "Implement cloudron_uninstall_app handler",
         "FIRST: Call F37 validate_operation with operation: 'uninstall', resource: appId",
-        "If F37 validation fails → return error, DO NOT proceed with API call",
-        "If F37 passes → call DELETE /api/v1/apps/:id",
+        "If F37 validation fails \u2192 return error, DO NOT proceed with API call",
+        "If F37 passes \u2192 call DELETE /api/v1/apps/:id",
         "Handle 202 Accepted response (async operation)",
         "Suggest F34 (task_status) for completion tracking",
         "Create Jest test mocking F37 validation + API call",
@@ -368,8 +368,8 @@
         "Define tool schema in server.ts with appId, config parameters",
         "Implement cloudron_install_app handler",
         "FIRST: Call F23a validate_manifest to check safety",
-        "If F23a validation fails → return error, DO NOT proceed",
-        "If F23a passes → call POST /api/v1/apps with manifest and config",
+        "If F23a validation fails \u2192 return error, DO NOT proceed",
+        "If F23a passes \u2192 call POST /api/v1/apps with manifest and config",
         "Handle 202 Accepted response (async installation)",
         "Return task ID for F34 (task_status) tracking",
         "Add error handling for invalid appId, installation failures",
@@ -448,8 +448,8 @@
         "Define tool schema in server.ts (no required params)",
         "Implement cloudron_create_backup handler",
         "FIRST: Call F36 check_storage to verify sufficient space",
-        "If F36 check fails → return error, DO NOT proceed",
-        "If F36 passes → call POST /api/v1/backups",
+        "If F36 check fails \u2192 return error, DO NOT proceed",
+        "If F36 passes \u2192 call POST /api/v1/backups",
         "Handle 202 Accepted response (async operation)",
         "Return task ID for F34 (task_status) tracking",
         "Add error handling for insufficient storage, backup failures",
@@ -497,9 +497,9 @@
         "Test empty user list returns []",
         "Update README.md with user listing documentation"
       ],
-      "status": "failing",
-      "test_status": "none",
-      "tried_count": 0,
+      "status": "passing",
+      "test_status": "passing",
+      "tried_count": 1,
       "last_error": null,
       "dependencies": [
         "F00"
@@ -515,7 +515,17 @@
         "Users sorted by role then email",
         "Empty user list returns empty array []",
         "API failure returns error with details"
-      ]
+      ],
+      "test_results": {
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "duration_seconds": 0.251,
+        "last_run": "2025-12-24T08:48:12.378554",
+        "command": "npm test -- cloudron-list-users",
+        "output_summary": "All 8 tests passed for F12 cloudron_list_users tool. Users sorted by role then email."
+      },
+      "git_commit": null
     },
     {
       "id": "F13",
@@ -1240,12 +1250,12 @@
     "phase_2_features": 20,
     "merged_features": 2,
     "not_started": 0,
-    "failing": 32,
+    "failing": 30,
     "merged": 2,
     "in_progress": 0,
-    "passing": 3,
+    "passing": 4,
     "reverted": 0,
-    "progress_percentage": "8.1"
+    "progress_percentage": "11.1"
   },
   "session_log": [
     {
@@ -1331,7 +1341,7 @@
         "F23 split into F23a (validate_manifest) + F23b (install_app) for two-phase safety",
         "F37 (validate_operation) pre-flight validation for destructive operations",
         "F36 (check_storage) pre-flight validation for data-creating operations",
-        "Hardened dependencies: F04→F37, F08→F36, F23b→F23a+F36"
+        "Hardened dependencies: F04\u2192F37, F08\u2192F36, F23b\u2192F23a+F36"
       ],
       "caspar_pragmatic": [
         "Merged F01/F02/F03 into single cloudron_control_app with action enum",
