@@ -115,4 +115,17 @@ export interface TaskStatus {
         code?: string;
     };
 }
+/**
+ * Operation types for pre-flight validation
+ */
+export type ValidatableOperation = 'uninstall_app' | 'delete_user' | 'restore_backup';
+/**
+ * Validation result for destructive operations
+ */
+export interface ValidationResult {
+    valid: boolean;
+    errors: string[];
+    warnings: string[];
+    recommendations: string[];
+}
 //# sourceMappingURL=types.d.ts.map
