@@ -20,6 +20,17 @@ export interface AppManifest {
     tagline?: string;
     website?: string;
     author?: string;
+    minBoxVersion?: string;
+    memoryLimit?: number;
+    addons?: Record<string, unknown>;
+}
+/**
+ * Manifest validation result for F23a
+ */
+export interface ManifestValidationResult {
+    valid: boolean;
+    errors: string[];
+    warnings: string[];
 }
 /**
  * Cloudron App representation
@@ -215,5 +226,13 @@ export interface AppConfig {
 export interface ConfigureAppResponse {
     app: App;
     restartRequired: boolean;
+}
+/**
+ * Validation result for app manifest (pre-flight safety check for installation)
+ */
+export interface ManifestValidationResult {
+    valid: boolean;
+    errors: string[];
+    warnings: string[];
 }
 //# sourceMappingURL=types.d.ts.map

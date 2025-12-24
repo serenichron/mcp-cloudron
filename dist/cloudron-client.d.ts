@@ -3,7 +3,7 @@
  * MVP scope: listApps + getApp endpoints
  * DI-enabled for testing
  */
-import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult, Backup, AppStoreApp, User, AppConfig, ConfigureAppResponse } from './types.js';
+import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult, Backup, AppStoreApp, User, LogType, LogEntry, AppConfig, ConfigureAppResponse, ManifestValidationResult } from './types.js';
 export declare class CloudronClient {
     private readonly baseUrl;
     private readonly token;
@@ -40,6 +40,12 @@ export declare class CloudronClient {
      * @returns Array of backups sorted by timestamp (newest first)
      */
     listBackups(): Promise<Backup[]>;
+    /**
+     * Create a new backup (with F36 pre-flight storage check)
+     * POST /api/v1/backups
+     * @returns Task ID for tracking backup progress via getTaskStatus()
+     */
+    createBackup(): Promise<string>;
     /**
      * List all users on Cloudron instance
      * GET /api/v1/users
@@ -108,6 +114,15 @@ export declare class CloudronClient {
      */
     configureApp(appId: string, config: AppConfig): Promise<ConfigureAppResponse>;
     /**
+     * Uninstall an application (DESTRUCTIVE OPERATION)
+     * DELETE /api/v1/apps/:id
+     * Returns 202 Accepted with task ID for async operation tracking
+     * Performs pre-flight validation via F37 before proceeding
+     */
+    uninstallApp(appId: string): Promise<{
+        taskId: string;
+    }>;
+    /**
      * Get task status for async operations
      * GET /api/v1/tasks/:taskId
      */
@@ -118,6 +133,20 @@ export declare class CloudronClient {
      * @returns Updated task status with 'cancelled' state
      */
     cancelTask(taskId: string): Promise<TaskStatus>;
+    /**
+     * Get logs for an app or service
+     * GET /api/v1/apps/:id/logs or GET /api/v1/services/:id/logs
+     * @param resourceId - App ID or service ID
+     * @param type - Type of resource ('app' or 'service')
+     * @param lines - Optional number of log lines to retrieve (default 100, max 1000)
+     * @returns Formatted log entries with timestamps and severity levels
+     */
+    getLogs(resourceId: string, type: LogType, lines?: number): Promise<LogEntry[]>;
+    /**
+     * Parse raw log lines into structured LogEntry objects
+     * Attempts to extract timestamp and severity level from log lines
+     */
+    private parseLogEntries;
     /**
      * Check available disk space for pre-flight validation
      * GET /api/v1/cloudron/status (reuses existing endpoint)
@@ -147,5 +176,13 @@ export declare class CloudronClient {
      * Checks: backup exists, backup integrity valid, sufficient storage
      */
     private validateRestoreBackup;
+    /**
+     * Validate app manifest before installation (F23a pre-flight safety check)
+     * Checks: F36 storage sufficient, dependencies available, configuration schema valid
+     * @param appId - The app ID to validate from App Store
+     * @param requiredMB - Optional disk space requirement in MB (defaults to 500MB)
+     * @returns Validation result with errors and warnings
+     */
+    validateManifest(appId: string, requiredMB?: number): Promise<ManifestValidationResult>;
 }
 //# sourceMappingURL=cloudron-client.d.ts.map
