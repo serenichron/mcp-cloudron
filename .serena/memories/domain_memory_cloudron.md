@@ -4,43 +4,81 @@
     "name": "Cloudron MCP Server - Feature Expansion (MAGI Re-Sequenced)",
     "type": "feature_development",
     "created_at": "2025-12-23T00:00:00Z",
-    "last_updated": "2025-12-24T02:00:00Z",
+    "last_updated": "2025-12-24T03:00:00Z",
     "repository_path": "/home/blackthorne/Work/cloudron",
     "primary_language": "typescript",
     "test_framework": "jest"
   },
-
   "goals": [
     {
       "id": "G0",
       "description": "Establish test infrastructure foundation",
       "status": "active",
       "success_criteria": "Jest test harness operational, all tests pass via 'npm test', coverage reporting enabled",
-      "features": ["F00"]
+      "features": [
+        "F00"
+      ]
     },
     {
       "id": "G1",
       "description": "Deliver MVP app lifecycle and backup management (Phase 1)",
       "status": "active",
       "success_criteria": "10 MVP features implemented with safety infrastructure, automated tests passing, ready for production use",
-      "features": ["F01", "F04", "F05", "F22", "F23a", "F23b", "F07", "F08", "F12", "F13", "F06"]
+      "features": [
+        "F01",
+        "F04",
+        "F05",
+        "F22",
+        "F23a",
+        "F23b",
+        "F07",
+        "F08",
+        "F12",
+        "F13",
+        "F06"
+      ]
     },
     {
       "id": "G2",
       "description": "Implement safety infrastructure (Phase 1)",
       "status": "active",
       "success_criteria": "Pre-flight validation (F37), storage checks (F36), async task tracking (F34), and cancellation (F35) operational",
-      "features": ["F34", "F35", "F36", "F37"]
+      "features": [
+        "F34",
+        "F35",
+        "F36",
+        "F37"
+      ]
     },
     {
       "id": "G3",
       "description": "Complete Phase 2 features (deferred)",
       "status": "active",
       "success_criteria": "23 Phase 2 features implemented after Phase 1 proves value",
-      "features": ["F09", "F11", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F24", "F25", "F26", "F27", "F28", "F29", "F30", "F31", "F32", "F33"]
+      "features": [
+        "F09",
+        "F11",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33"
+      ]
     }
   ],
-
   "features": [
     {
       "id": "F00",
@@ -79,7 +117,43 @@
       "last_error": null,
       "dependencies": [],
       "blocked_by": [],
-      "blocks": ["F01", "F04", "F05", "F06", "F07", "F08", "F09", "F11", "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23a", "F23b", "F24", "F25", "F26", "F27", "F28", "F29", "F30", "F31", "F32", "F33", "F34", "F35", "F36", "F37"],
+      "blocks": [
+        "F01",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23a",
+        "F23b",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33",
+        "F34",
+        "F35",
+        "F36",
+        "F37"
+      ],
       "priority": "critical",
       "estimated_effort": "medium",
       "recommended_agent": "quality-engineer",
@@ -115,7 +189,9 @@
       "git_commit": "200146f68025a7118583d58cfbf47675c1fe27a2",
       "tried_count": 1,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "small",
@@ -127,7 +203,7 @@
         "Action 'restart' returns 202 Accepted and calls POST /api/v1/apps/:id/restart",
         "Invalid appId returns 404 Not Found with error message",
         "Invalid action returns 400 Bad Request with enum options listed",
-        "App state transitions verified (running→stopped, stopped→running)"
+        "App state transitions verified (running\u2192stopped, stopped\u2192running)"
       ]
     },
     {
@@ -139,8 +215,8 @@
         "Define tool schema in server.ts with appId parameter",
         "Implement cloudron_uninstall_app handler",
         "FIRST: Call F37 validate_operation with operation: 'uninstall', resource: appId",
-        "If F37 validation fails → return error, DO NOT proceed with API call",
-        "If F37 passes → call DELETE /api/v1/apps/:id",
+        "If F37 validation fails \u2192 return error, DO NOT proceed with API call",
+        "If F37 passes \u2192 call DELETE /api/v1/apps/:id",
         "Handle 202 Accepted response (async operation)",
         "Suggest F34 (task_status) for completion tracking",
         "Create Jest test mocking F37 validation + API call",
@@ -151,7 +227,10 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F37"],
+      "dependencies": [
+        "F00",
+        "F37"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "medium",
@@ -189,7 +268,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "medium",
@@ -243,7 +324,9 @@
       "git_commit": "013dd02fc3ed0b883e68e09ba28b4ba0b3e4f936",
       "tried_count": 1,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "small",
@@ -280,9 +363,14 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F36"],
+      "dependencies": [
+        "F00",
+        "F36"
+      ],
       "blocked_by": [],
-      "blocks": ["F23b"],
+      "blocks": [
+        "F23b"
+      ],
       "priority": "high",
       "estimated_effort": "medium",
       "recommended_agent": "backend-architect",
@@ -306,8 +394,8 @@
         "Define tool schema in server.ts with appId, config parameters",
         "Implement cloudron_install_app handler",
         "FIRST: Call F23a validate_manifest to check safety",
-        "If F23a validation fails → return error, DO NOT proceed",
-        "If F23a passes → call POST /api/v1/apps with manifest and config",
+        "If F23a validation fails \u2192 return error, DO NOT proceed",
+        "If F23a passes \u2192 call POST /api/v1/apps with manifest and config",
         "Handle 202 Accepted response (async installation)",
         "Return task ID for F34 (task_status) tracking",
         "Add error handling for invalid appId, installation failures",
@@ -319,7 +407,11 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F23a", "F36"],
+      "dependencies": [
+        "F00",
+        "F23a",
+        "F36"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "large",
@@ -357,7 +449,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "small",
@@ -380,8 +474,8 @@
         "Define tool schema in server.ts (no required params)",
         "Implement cloudron_create_backup handler",
         "FIRST: Call F36 check_storage to verify sufficient space",
-        "If F36 check fails → return error, DO NOT proceed",
-        "If F36 passes → call POST /api/v1/backups",
+        "If F36 check fails \u2192 return error, DO NOT proceed",
+        "If F36 passes \u2192 call POST /api/v1/backups",
         "Handle 202 Accepted response (async operation)",
         "Return task ID for F34 (task_status) tracking",
         "Add error handling for insufficient storage, backup failures",
@@ -393,7 +487,10 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F36"],
+      "dependencies": [
+        "F00",
+        "F36"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "medium",
@@ -430,7 +527,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "small",
@@ -463,11 +562,13 @@
         "Test duplicate email returns 409 Conflict",
         "Update README.md with user creation and role documentation"
       ],
-      "status": "failing",
-      "test_status": "none",
-      "tried_count": 0,
+      "status": "passing",
+      "test_status": "passing",
+      "tried_count": 1,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "medium",
@@ -482,7 +583,17 @@
         "Invalid role returns 400 Bad Request with enum options",
         "User created with correct role in single operation",
         "API returns 201 Created with user object"
-      ]
+      ],
+      "test_results": {
+        "passed": 18,
+        "failed": 0,
+        "skipped": 0,
+        "duration_seconds": 0.299,
+        "last_run": "2025-12-24T03:00:00Z",
+        "command": "npm test -- cloudron-create-user.test.ts",
+        "output_summary": "All 18 tests passed for F13 cloudron_create_user tool. All test anchors validated: POST creates user with role atomically, role enum (admin/user/guest), password strength (8+ chars, uppercase, number), email format validation, 409 Conflict for duplicates, 400 for invalid role, 201 Created response."
+      },
+      "git_commit": "43c0b4b"
     },
     {
       "id": "F06",
@@ -506,7 +617,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "medium",
@@ -553,7 +666,9 @@
       "git_commit": "7c97681a5828dcbdce2001bc114ba5f7b03a8108",
       "tried_count": 1,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "small",
@@ -589,7 +704,10 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F34"],
+      "dependencies": [
+        "F00",
+        "F34"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "small",
@@ -627,7 +745,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "small",
@@ -665,7 +785,10 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F36"],
+      "dependencies": [
+        "F00",
+        "F36"
+      ],
       "blocked_by": [],
       "priority": "high",
       "estimated_effort": "large",
@@ -696,7 +819,13 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F07", "F08", "F34", "F37"],
+      "dependencies": [
+        "F00",
+        "F07",
+        "F08",
+        "F34",
+        "F37"
+      ],
       "blocked_by": [],
       "priority": "medium",
       "estimated_effort": "large",
@@ -715,7 +844,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "medium",
@@ -735,7 +866,12 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F12", "F13", "F37"],
+      "dependencies": [
+        "F00",
+        "F12",
+        "F13",
+        "F37"
+      ],
       "blocked_by": [],
       "priority": "medium",
       "estimated_effort": "small",
@@ -771,7 +907,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "small",
@@ -790,7 +928,10 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F16"],
+      "dependencies": [
+        "F00",
+        "F16"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "small",
@@ -809,7 +950,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "medium",
       "estimated_effort": "small",
@@ -828,7 +971,10 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F18"],
+      "dependencies": [
+        "F00",
+        "F18"
+      ],
       "blocked_by": [],
       "priority": "medium",
       "estimated_effort": "medium",
@@ -847,7 +993,10 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F18"],
+      "dependencies": [
+        "F00",
+        "F18"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "medium",
@@ -866,7 +1015,10 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F18"],
+      "dependencies": [
+        "F00",
+        "F18"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "medium",
@@ -885,7 +1037,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "medium",
       "estimated_effort": "medium",
@@ -904,7 +1058,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "small",
@@ -923,7 +1079,10 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F25"],
+      "dependencies": [
+        "F00",
+        "F25"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "medium",
@@ -942,7 +1101,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "small",
@@ -961,7 +1122,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "large",
@@ -980,7 +1143,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "small",
@@ -1016,7 +1181,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "small",
@@ -1035,7 +1202,9 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00"],
+      "dependencies": [
+        "F00"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "small",
@@ -1054,7 +1223,10 @@
       "test_status": "none",
       "tried_count": 0,
       "last_error": null,
-      "dependencies": ["F00", "F32"],
+      "dependencies": [
+        "F00",
+        "F32"
+      ],
       "blocked_by": [],
       "priority": "low",
       "estimated_effort": "medium",
@@ -1062,7 +1234,6 @@
       "agent_capabilities_required": "TypeScript, REST API integration, async operations, destructive operation safety, MCP protocol"
     }
   ],
-
   "constraints": [
     "F00 test harness BLOCKS all feature development (MANDATORY first step)",
     "All destructive operations (F04, F09, F14) REQUIRE F37 pre-flight validation",
@@ -1078,7 +1249,6 @@
     "No breaking changes to published npm package API",
     "Phase 2 features (23 total) deferred until Phase 1 (14 features) proves value"
   ],
-
   "test_infrastructure": {
     "test_command": "npm test",
     "test_directory": "tests/",
@@ -1089,7 +1259,6 @@
     "mock_api_responses": true,
     "test_credentials": "Mocked in tests/helpers/cloudron-mock.ts"
   },
-
   "progress": {
     "total_features": 37,
     "phase_0_features": 1,
@@ -1097,14 +1266,13 @@
     "phase_2_features": 20,
     "merged_features": 2,
     "not_started": 0,
-    "failing": 31,
+    "failing": 30,
     "merged": 2,
     "in_progress": 0,
-    "passing": 4,
+    "passing": 5,
     "reverted": 0,
-    "progress_percentage": 10.8
+    "progress_percentage": 13.5
   },
-
   "session_log": [
     {
       "session_id": "session_001",
@@ -1125,9 +1293,15 @@
       "started_at": "2025-12-23T14:00:00Z",
       "ended_at": "2025-12-23T14:30:00Z",
       "agent_type": "worker",
-      "features_attempted": ["F00"],
-      "features_completed": ["F00"],
-      "commits": ["ccc8e7d38b93b409f6dfa02df11cf89ebf148902"],
+      "features_attempted": [
+        "F00"
+      ],
+      "features_completed": [
+        "F00"
+      ],
+      "commits": [
+        "ccc8e7d38b93b409f6dfa02df11cf89ebf148902"
+      ],
       "notes": "Implemented F00 test harness: Jest dependencies installed, jest.config.cjs configured for ES modules, test helpers created (cloudron-mock.ts, mcp-assert.ts), example test cloudron-list-apps.test.ts demonstrates pattern, all 7 tests passing, coverage 81.25% statements"
     },
     {
@@ -1135,9 +1309,15 @@
       "started_at": "2025-12-23T15:00:00Z",
       "ended_at": "2025-12-23T15:45:00Z",
       "agent_type": "worker",
-      "features_attempted": ["F34"],
-      "features_completed": ["F34"],
-      "commits": ["7c97681a5828dcbdce2001bc114ba5f7b03a8108"],
+      "features_attempted": [
+        "F34"
+      ],
+      "features_completed": [
+        "F34"
+      ],
+      "commits": [
+        "7c97681a5828dcbdce2001bc114ba5f7b03a8108"
+      ],
       "notes": "Implemented F34 task_status: Added TaskStatus interface, CloudronClient.getTaskStatus() method, cloudron_task_status MCP tool, comprehensive Jest test suite with 7 tests covering all states (pending/running/success/error), 404 handling, result/error formatting. All tests passing, coverage 85.71%."
     },
     {
@@ -1145,9 +1325,15 @@
       "started_at": "2025-12-24T00:00:00Z",
       "ended_at": "2025-12-24T01:00:00Z",
       "agent_type": "worker",
-      "features_attempted": ["F01"],
-      "features_completed": ["F01"],
-      "commits": ["200146f68025a7118583d58cfbf47675c1fe27a2"],
+      "features_attempted": [
+        "F01"
+      ],
+      "features_completed": [
+        "F01"
+      ],
+      "commits": [
+        "200146f68025a7118583d58cfbf47675c1fe27a2"
+      ],
       "notes": "Implemented F01 cloudron_control_app (merged F01/F02/F03): Added CloudronClient methods (startApp, stopApp, restartApp), implemented MCP tool with action enum, comprehensive Jest test suite with 19 tests covering all actions, 404 handling, state transitions, and async task ID return. All test anchors validated. Added helper functions mockSuccessResponse, mockErrorResponse, mockApp, mockSystemStatus to cloudron-mock.ts."
     },
     {
@@ -1155,13 +1341,34 @@
       "started_at": "2025-12-24T01:30:00Z",
       "ended_at": "2025-12-24T02:00:00Z",
       "agent_type": "worker",
-      "features_attempted": ["F22"],
-      "features_completed": ["F22"],
-      "commits": ["013dd02fc3ed0b883e68e09ba28b4ba0b3e4f936"],
+      "features_attempted": [
+        "F22"
+      ],
+      "features_completed": [
+        "F22"
+      ],
+      "commits": [
+        "013dd02fc3ed0b883e68e09ba28b4ba0b3e4f936"
+      ],
       "notes": "Implemented F22 cloudron_search_apps: Added AppStoreApp/AppStoreResponse interfaces to types.ts, CloudronClient.searchApps() method with relevance sorting, cloudron_search_apps MCP tool with query parameter, comprehensive Jest test suite with 8 tests. All test anchors validated: query search, empty query returns all apps, empty result array, relevance score sorting, missing optional fields, auth/server errors. Coverage improved to 90.72% statements, 76.13% branches, 88.88% functions, 91.83% lines."
+    },
+    {
+      "session_id": "session_007",
+      "started_at": "2025-12-24T02:30:00Z",
+      "ended_at": "2025-12-24T03:00:00Z",
+      "agent_type": "worker",
+      "features_attempted": [
+        "F13"
+      ],
+      "features_completed": [
+        "F13"
+      ],
+      "commits": [
+        "43c0b4b"
+      ],
+      "notes": "Implemented F13 cloudron_create_user (merged F13/F15): Added CloudronClient.createUser() with atomic role assignment, password strength validation (8+ chars, 1 uppercase, 1 number), email format validation (RFC 5322 simplified), role enum (admin/user/guest), comprehensive Jest test suite with 18 tests. All test anchors validated: POST /api/v1/users creates user atomically, role enum validation, password/email validation, 409 Conflict for duplicates, 400 for invalid role, 201 Created response. All 98 tests passing (18 new F13 tests)."
     }
   ],
-
   "technical_context": {
     "architecture_notes": "TypeScript MCP server using stdio transport for Claude Code integration. Published as @serenichron/mcp-cloudron on npm. 3 core tools already implemented and working. MAGI consensus applied: Melchior (F00 test harness, test anchors), Balthasar (F23a/F23b split, F37 validation, F36 storage), Caspar (feature merges, phased delivery).",
     "published_package": "@serenichron/mcp-cloudron v0.1.0",
@@ -1182,7 +1389,7 @@
         "F23 split into F23a (validate_manifest) + F23b (install_app) for two-phase safety",
         "F37 (validate_operation) pre-flight validation for destructive operations",
         "F36 (check_storage) pre-flight validation for data-creating operations",
-        "Hardened dependencies: F04→F37, F08→F36, F23b→F23a+F36"
+        "Hardened dependencies: F04\u2192F37, F08\u2192F36, F23b\u2192F23a+F36"
       ],
       "caspar_pragmatic": [
         "Merged F01/F02/F03 into single cloudron_control_app with action enum",
