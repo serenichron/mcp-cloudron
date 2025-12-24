@@ -4,7 +4,7 @@
     "name": "Cloudron MCP Server - Feature Expansion (MAGI Re-Sequenced)",
     "type": "feature_development",
     "created_at": "2025-12-23T00:00:00Z",
-    "last_updated": "2025-12-24T12:00:00Z",
+    "last_updated": "2025-12-24T04:00:00Z",
     "repository_path": "/home/blackthorne/Work/cloudron",
     "primary_language": "typescript",
     "test_framework": "jest"
@@ -587,9 +587,9 @@
         "Test both app and service log types",
         "Update README.md with merged log tool documentation"
       ],
-      "status": "failing",
-      "test_status": "none",
-      "tried_count": 0,
+      "status": "passing",
+      "test_status": "passing",
+      "tried_count": 1,
       "last_error": null,
       "dependencies": [
         "F00"
@@ -607,7 +607,17 @@
         "Invalid type returns 400 Bad Request with enum options",
         "Logs formatted with timestamps and severity levels",
         "API failure returns error with details"
-      ]
+      ],
+      "git_commit": "5a72f2c",
+      "test_results": {
+        "passed": 19,
+        "failed": 0,
+        "skipped": 0,
+        "duration_seconds": 0.276,
+        "last_run": "2025-12-24T04:00:00Z",
+        "command": "npm test -- cloudron-get-logs.test.ts",
+        "output_summary": "All 19 tests passed for F06 cloudron_get_logs tool. All test anchors validated: type app/service routing, lines parameter clamping (1-1000), 404 for invalid resourceId, 400 for invalid type, log formatting (ISO/syslog/simple/plain), URL encoding, empty logs handling."
+      }
     },
     {
       "id": "F34",
@@ -1263,9 +1273,9 @@
     "failing": 29,
     "merged": 2,
     "in_progress": 0,
-    "passing": 5,
+    "passing": 6,
     "reverted": 0,
-    "progress_percentage": "13.5"
+    "progress_percentage": 16.2
   },
   "session_log": [
     {
@@ -1361,6 +1371,22 @@
         "b0b7fddbc4f52766118131199646ed8d75fcac46"
       ],
       "notes": "Implemented F35 cloudron_cancel_task: Added 'cancelled' state to TaskStatus type, CloudronClient.cancelTask() method with DELETE /api/v1/tasks/:id, cloudron_cancel_task MCP tool, updated task_status handler to display cancelled state. 8 comprehensive tests passing (running task cancellation, 404 handling, completed task validation, resource cleanup, HTTP method verification, endpoint validation). All 129 tests passing."
+    },
+    {
+      "session_id": "session_008",
+      "started_at": "2025-12-24T03:30:00Z",
+      "ended_at": "2025-12-24T04:00:00Z",
+      "agent_type": "worker",
+      "features_attempted": [
+        "F06"
+      ],
+      "features_completed": [
+        "F06"
+      ],
+      "commits": [
+        "5a72f2c"
+      ],
+      "notes": "Implemented F06 cloudron_get_logs (merged F06/F30): Added LogType/LogEntry/LogsResponse to types.ts, CloudronClient.getLogs() with type enum (app/service), intelligent log parsing (ISO/syslog/simple/plain formats), comprehensive Jest test suite with 19 tests. All test anchors validated: type parameter routes to correct endpoint, lines clamping (min 1, max 1000), 404 for invalid resourceId, 400 for invalid type with enum options, log formatting with timestamps/severity. All 148 tests passing (19 new F06 tests)."
     }
   ],
   "technical_context": {
