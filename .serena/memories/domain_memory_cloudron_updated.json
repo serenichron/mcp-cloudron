@@ -525,7 +525,7 @@
         "command": "npm test -- cloudron-list-users",
         "output_summary": "All 8 tests passed for F12 cloudron_list_users tool. Users sorted by role then email."
       },
-      "git_commit": null
+      "git_commit": "013dd02fc3ed0b883e68e09ba28b4ba0b3e4f936"
     },
     {
       "id": "F13",
@@ -1319,6 +1319,22 @@
         "09c3638"
       ],
       "notes": "Implemented F37 validate_operation: Added ValidatableOperation type and ValidationResult interface, CloudronClient.validateOperation() with three operation types (uninstall_app, delete_user, restore_backup), cloudron_validate_operation MCP tool. 13 comprehensive tests covering all operation types, validation logic, and error handling. Integration with F36 (checkStorage) for restore_backup validation. All tests passing."
+    },
+    {
+      "session_id": "session_006",
+      "started_at": "2025-12-24T08:30:00Z",
+      "ended_at": "2025-12-24T08:52:25.697804",
+      "agent_type": "worker",
+      "features_attempted": [
+        "F12"
+      ],
+      "features_completed": [
+        "F12"
+      ],
+      "commits": [
+        "013dd02fc3ed0b883e68e09ba28b4ba0b3e4f936"
+      ],
+      "notes": "Implemented F12 cloudron_list_users: Added User/UsersResponse interfaces, CloudronClient.listUsers() method, MCP tool handler. Users sorted by role (admin/user/guest) then email. 8 comprehensive tests passing, covering sorting, empty list, error handling, environment validation. All tests passing (80/80 total)."
     }
   ],
   "technical_context": {
