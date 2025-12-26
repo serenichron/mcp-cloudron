@@ -168,13 +168,30 @@ The server uses the [Cloudron REST API](https://docs.cloudron.io/api/). Currentl
 - `GET /api/v1/apps/:id` - Get application by ID
 - `GET /api/v1/cloudron/status` - Get instance status
 
+## Changelog
+
+### v0.2.0 (2025-12-26)
+
+**New Features**:
+- 15 new MCP tools across app management, backups, users, infrastructure
+- Pre-flight validation for destructive operations (F37)
+- Storage checks before data creation (F36)
+- Async task tracking and cancellation (F34, F35)
+
+**Critical Bug Fixes**:
+- F23b: Corrected endpoint path and added required domain parameter
+- F04: Fixed HTTP method (DELETE → POST) for uninstall operation
+- Both bugs discovered via real API testing (mock tests validated nothing)
+
+**Testing**:
+- Real Cloudron API integration testing
+- Validated against live instance
+- All 16 tools tested with actual API calls
+
 ## Roadmap
 
 Future versions may include:
 
-- [ ] App lifecycle management (start, stop, restart)
-- [ ] Backup operations
-- [ ] User management
 - [ ] Domain configuration
 - [ ] App installation from App Store
 
