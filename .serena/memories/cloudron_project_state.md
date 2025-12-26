@@ -24,15 +24,25 @@ TypeScript-based MCP server that enables Claude to manage Cloudron instances thr
 #### Phase 0: Foundation (COMPLETE)
 ✅ **F00**: Test harness infrastructure (Jest, automated testing)
 
-#### Phase 1: MVP + Safety (13/14 COMPLETE - 92.9%)
+#### Phase 1: MVP + Safety (14/14 COMPLETE - 100%)
 
-**MVP Features (10/10 COMPLETE)**:
+**MVP Features (11/11 COMPLETE)**:
 1. ✅ **F01**: App lifecycle control (merged F01/F02/F03) - start/stop/restart with action enum
 2. ✅ **F04**: Uninstall app with F37 pre-flight validation
 3. ✅ **F05**: Configure app (env vars, resource limits, access control)
 4. ✅ **F22**: Search Cloudron App Store
 5. ✅ **F23a**: Validate app manifest (pre-flight safety)
 6. ✅ **F23b**: Install app with F23a pre-flight validation and F36 storage check
+   - **CRITICAL BUGS FIXED** (2025-12-26): Real API testing revealed 3 bugs that mock tests missed:
+     1. Wrong endpoint: `/api/v1/apps/install` → `/api/v1/apps` (corrected)
+     2. Missing required `domain` parameter (added to types + schema)
+     3. `accessRestriction` handling: Changed from optional to required (can be null)
+   - **Files Updated**: 
+     - `src/types.ts`: Added `domain: string`, changed `accessRestriction?: string` → `accessRestriction: string | null`
+     - `src/cloudron-client.ts` line 765: Corrected endpoint to `/api/v1/apps`
+     - `src/server.ts`: Added `domain` to schema, made `accessRestriction` required
+   - **Build Status**: ✅ Succeeds
+   - **Real Test**: ✅ Passed (app installed successfully with corrected parameters)
 7. ✅ **F07**: List backups
 8. ✅ **F08**: Create backup with F36 storage check (merged F08/F10)
 9. ✅ **F12**: List users
@@ -46,7 +56,7 @@ TypeScript-based MCP server that enables Claude to manage Cloudron instances thr
 15. ✅ **F37**: Validate operation (pre-flight safety for destructive operations)
 
 **Phase 1 Status**: 14/14 features COMPLETE (100%) ✅
-**MILESTONE**: Phase 1 MVP + Safety Infrastructure complete, ready for v0.2.0 release
+**MILESTONE**: Phase 1 MVP + Safety Infrastructure complete, F23b bugs fixed, ready for v0.2.0 release
 
 #### Phase 2: Deferred Features (0/20 COMPLETE)
 - F09: Restore backup
@@ -64,9 +74,11 @@ TypeScript-based MCP server that enables Claude to manage Cloudron instances thr
 - **Functions**: 88.88%
 - **Lines**: 91.83%
 - **Test Framework**: Jest 29.x with TypeScript
+- **NOTE**: F23b real API testing revealed critical bugs that mock tests missed. Demonstrates value of real-world validation.
 
 ### Recent Git Commits
 
+- `2b2f8f1` - docs: document F23b critical bugs found via real API testing
 - `791b0a2` - feat(api): implement F23b cloudron_install_app tool
 - `4354a47` - feat(api): implement F23a cloudron_validate_manifest tool
 - `2405625` - feat(api): implement F08 cloudron_create_backup tool
@@ -134,7 +146,7 @@ TypeScript-based MCP server that enables Claude to manage Cloudron instances thr
 6. **cloudron_uninstall_app** - Uninstall app with pre-flight validation
 7. **cloudron_search_apps** - Search Cloudron App Store
 8. **cloudron_validate_manifest** - Validate app manifest before install
-9. **cloudron_install_app** - Install app (F23b - pending)
+9. **cloudron_install_app** - Install app (F23b bugs fixed 2025-12-26)
 10. **cloudron_get_logs** - Get app or service logs (type enum)
 
 **Backup Management** (2 tools):
@@ -183,6 +195,7 @@ git push origin master
 - ✅ 16/37 features passing (43.2%)
 - ✅ Phase 0 complete (1/1 features, 100%)
 - ✅ **Phase 1 COMPLETE** (14/14 features, 100%) 🎉
+- ✅ F23b critical bugs fixed (real API testing validated)
 - ✅ Test coverage >90% lines (91.83%)
 - ✅ All test anchors validated with specific assertions
 - ✅ MAGI consensus applied (hybrid approach)
@@ -194,14 +207,14 @@ git push origin master
 ### Immediate (Phase 1 Complete - Ready for Release)
 1. **Publish v0.2.0** to npm with 15 new tools
    - All 16 MCP tools (3 existing + 13 new) tested and validated
+   - F23b bugs fixed (endpoint, domain parameter, accessRestriction handling)
    - 198 test suite (194 passing, 4 F23a test mock issues)
    - Phase 1 complete (14/14 features, 100%)
    
 ### Phase 2 (Evaluate Priority)
-2. **Publish v0.2.0** to npm with 15 new tools
-3. **Update README.md** with new tool documentation
-4. **Evaluate Phase 2 priority** based on user feedback
-5. **Community engagement** (monitor GitHub issues, forum responses)
+2. **Update README.md** with new tool documentation
+3. **Evaluate Phase 2 priority** based on user feedback
+4. **Community engagement** (monitor GitHub issues, forum responses)
 
 ## Session History
 
@@ -223,6 +236,15 @@ git push origin master
 - All 16 MCP tools validated as functioning correctly
 - **Progress**: 16/37 features (43.2%), 14/14 Phase 1 features COMPLETE (100%)
 
+**Session 6** (2025-12-26): F23b critical bug fixes
+- Real API testing revealed 3 critical bugs that mock tests missed:
+  1. Wrong endpoint `/api/v1/apps/install` → `/api/v1/apps`
+  2. Missing required `domain` parameter
+  3. `accessRestriction` handling: optional → required (can be null)
+- Fixed in types.ts, cloudron-client.ts, server.ts
+- Build succeeds, real install test passed
+- Demonstrates value of real-world validation beyond mock tests
+
 ## Key Learnings
 
 1. **Worker Pattern Success**: Stateless workers implementing ONE feature atomically works exceptionally well
@@ -231,13 +253,14 @@ git push origin master
 4. **Safety Gates**: F36/F37 pre-flight validation prevents destructive errors
 5. **Test-First**: Automated Jest tests (not manual) enable CI/CD and regression detection
 6. **Feature Merges**: Consolidating redundant operations (F01/F02/F03, F06/F30, etc.) reduces complexity
+7. **Real vs Mock Testing**: F23b bugs show mock tests give false confidence. Real API testing catches critical issues.
 
 ## Asana Integration
 
 **Workspace**: Serenichron (gid: 1209371498667366)  
 **Project**: Cloudron MCP Integration  
 **Task**: "Cloudron MCP Server - Full Development & Release" (gid: 1209371574206093)  
-**Status**: In Progress (Phase 1 at 92.9%)
+**Status**: In Progress (Phase 1 at 100%, F23b bugs fixed)
 
 ## Community Engagement
 
@@ -258,6 +281,7 @@ git push origin master
 - Automated test suite (179 tests passing)
 - Safety gates (pre-flight validation)
 - Async operation tracking
+- F23b critical bugs fixed (endpoint, domain, accessRestriction)
 
 **v0.3.0** (Phase 2 - Future):
 - Backup restore operations
@@ -266,4 +290,4 @@ git push origin master
 - System updates
 - Community-driven feature requests
 
-**Status**: Phase 1 COMPLETE (14/14 features, 100%). Ready for v0.2.0 release with 15 new MCP tools. Evaluate Phase 2 priorities based on community feedback.
+**Status**: Phase 1 COMPLETE (14/14 features, 100%). F23b bugs fixed. Ready for v0.2.0 release with 15 new MCP tools. Evaluate Phase 2 priorities based on community feedback.
