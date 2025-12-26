@@ -38,8 +38,9 @@ export interface ManifestValidationResult {
 export interface InstallAppParams {
     manifestId: string;
     location: string;
+    domain: string;
     portBindings?: Record<string, number>;
-    accessRestriction?: string;
+    accessRestriction: string | null;
     env?: Record<string, string>;
 }
 /**
