@@ -209,6 +209,15 @@ export class CloudronClient {
         });
     }
     /**
+     * List all configured domains on Cloudron instance
+     * GET /api/v1/domains
+     * @returns Array of domain configurations
+     */
+    async listDomains() {
+        const response = await this.makeRequest('GET', '/api/v1/domains');
+        return response.domains;
+    }
+    /**
      * Validate email format using RFC 5322 simplified regex
      * @param email - Email to validate
      * @returns true if email format is valid

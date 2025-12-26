@@ -3,7 +3,7 @@
  * MVP scope: listApps + getApp endpoints
  * DI-enabled for testing
  */
-import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult, Backup, AppStoreApp, User, LogType, LogEntry, AppConfig, ConfigureAppResponse, ManifestValidationResult, InstallAppParams } from './types.js';
+import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult, Backup, AppStoreApp, User, LogType, LogEntry, AppConfig, ConfigureAppResponse, ManifestValidationResult, InstallAppParams, Domain } from './types.js';
 export declare class CloudronClient {
     private readonly baseUrl;
     private readonly token;
@@ -68,6 +68,12 @@ export declare class CloudronClient {
      * @returns Created user object
      */
     createUser(email: string, password: string, role: 'admin' | 'user' | 'guest'): Promise<User>;
+    /**
+     * List all configured domains on Cloudron instance
+     * GET /api/v1/domains
+     * @returns Array of domain configurations
+     */
+    listDomains(): Promise<Domain[]>;
     /**
      * Validate email format using RFC 5322 simplified regex
      * @param email - Email to validate
