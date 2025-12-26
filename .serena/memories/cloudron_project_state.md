@@ -202,6 +202,28 @@ git push origin master
 - ✅ Safety infrastructure operational (F34-F37)
 - ✅ All 16 MCP tools validated as functioning correctly
 
+## Goals
+
+### G4: MCP Marketplace Distribution (NEW)
+
+**Status**: Pending (post v0.2.0 release)  
+**Priority**: Medium  
+**Description**: Research and publish @serenichron/mcp-cloudron to all major MCP marketplaces  
+
+**Tasks**:
+1. Research available MCP marketplaces (Smithery, MCP Hub, Glama, others)
+2. Document submission requirements for each marketplace
+3. Create marketplace listing materials (descriptions, screenshots, demos)
+4. Submit to each marketplace
+5. Verify listings are live and functional
+6. Monitor marketplace analytics
+
+**Success Criteria**: MCP server listed on 3+ major marketplaces with installation instructions
+
+**Estimated Effort**: 2-3 hours total (30-40 min per marketplace)
+
+**Dependencies**: v0.2.0 npm release complete
+
 ## Next Steps
 
 ### Immediate (Phase 1 Complete - Ready for Release)
@@ -215,6 +237,7 @@ git push origin master
 2. **Update README.md** with new tool documentation
 3. **Evaluate Phase 2 priority** based on user feedback
 4. **Community engagement** (monitor GitHub issues, forum responses)
+5. **G4: MCP Marketplace Distribution** - Research and submit to 3+ marketplaces (post v0.2.0)
 
 ## Session History
 

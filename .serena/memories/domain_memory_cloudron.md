@@ -4,7 +4,7 @@
     "name": "Cloudron MCP Server - Feature Expansion (MAGI Re-Sequenced)",
     "type": "feature_development",
     "created_at": "2025-12-23T00:00:00Z",
-    "last_updated": "2025-12-24T15:00:00Z",
+    "last_updated": "2025-12-26T00:00:00Z",
     "repository_path": "/home/blackthorne/Work/cloudron",
     "primary_language": "typescript",
     "test_framework": "jest"
@@ -35,8 +35,8 @@
       "id": "G3",
       "description": "Complete Phase 2 features (deferred)",
       "status": "active",
-      "success_criteria": "23 Phase 2 features implemented after Phase 1 proves value",
-      "features": ["F09", "F11", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F24", "F25", "F26", "F27", "F28", "F29", "F30", "F31", "F32", "F33"]
+      "success_criteria": "24 Phase 2 features implemented after Phase 1 proves value",
+      "features": ["F09", "F11", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F24", "F25", "F26", "F27", "F28", "F29", "F30", "F31", "F32", "F33", "F38"]
     }
   ],
   "features": [
@@ -77,7 +77,7 @@
       "last_error": null,
       "dependencies": [],
       "blocked_by": [],
-      "blocks": ["F01", "F04", "F05", "F06", "F07", "F08", "F09", "F11", "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23a", "F23b", "F24", "F25", "F26", "F27", "F28", "F29", "F30", "F31", "F32", "F33", "F34", "F35", "F36", "F37"],
+      "blocks": ["F01", "F04", "F05", "F06", "F07", "F08", "F09", "F11", "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23a", "F23b", "F24", "F25", "F26", "F27", "F28", "F29", "F30", "F31", "F32", "F33", "F34", "F35", "F36", "F37", "F38"],
       "priority": "critical",
       "estimated_effort": "medium",
       "recommended_agent": "quality-engineer",
@@ -131,6 +131,48 @@
         "Missing dependencies listed in errors"
       ],
       "implementation_notes": "Implementation complete. Tool added to server.ts (line 206-219 definition, line 735-772 handler). CloudronClient.validateManifest() method implemented (uses existing F36 checkStorage). ManifestValidationResult type added to types.ts. Test file created with 11 tests (7 passing). Test failures are due to mock structure complexity (SystemStatus disk format uses bytes, tests used MB). Core functionality verified working: tool responds, validates manifests, calls F36 storage check, returns proper validation report structure."
+    },
+    {
+      "id": "F38",
+      "goal_id": "G3",
+      "category": "domain_management",
+      "description": "List all configured domains on Cloudron instance",
+      "steps": [
+        "Define tool schema in server.ts with cloudron_list_domains",
+        "Add Domain interface to types.ts (domain, provider, verified, createdAt, tlsConfig)",
+        "Implement CloudronClient.listDomains() method calling GET /api/v1/domains",
+        "Add cloudron_list_domains handler in server.ts",
+        "Return domain list with verification status and TLS config",
+        "Add error handling for API failures",
+        "Create Jest test tests/cloudron-list-domains.test.ts",
+        "Test empty domain list returns []",
+        "Test multiple domains with verification status",
+        "Test TLS configuration fields present",
+        "Update README.md with domain listing documentation"
+      ],
+      "status": "failing",
+      "test_status": "none",
+      "tried_count": 0,
+      "last_error": null,
+      "dependencies": ["F00"],
+      "blocked_by": [],
+      "blocks": [],
+      "priority": "high",
+      "estimated_effort": "small",
+      "recommended_agent": "backend-architect",
+      "agent_capabilities_required": "TypeScript, REST API integration, MCP protocol, Jest testing",
+      "test_anchors": [
+        "GET /api/v1/domains returns domain list",
+        "Domain interface includes domain, provider, verified, createdAt, tlsConfig fields",
+        "Empty domain list returns []",
+        "Multiple domains sorted by domain name",
+        "Verification status correctly reflected",
+        "TLS configuration fields present",
+        "Authentication errors return 401",
+        "Server errors return 500"
+      ],
+      "source": "Community feedback 2025-12-26",
+      "implementation_notes": null
     }
   ],
   "constraints": [
@@ -146,7 +188,7 @@
     "Types.ts must include all new type definitions",
     "Follow existing code style and project structure",
     "No breaking changes to published npm package API",
-    "Phase 2 features (23 total) deferred until Phase 1 (14 features) proves value"
+    "Phase 2 features (24 total) deferred until Phase 1 (14 features) proves value"
   ],
   "test_infrastructure": {
     "test_command": "npm test",
@@ -159,18 +201,18 @@
     "test_credentials": "Mocked in tests/helpers/cloudron-mock.ts"
   },
   "progress": {
-    "total_features": 37,
+    "total_features": 38,
     "phase_0_features": 1,
     "phase_1_features": 14,
-    "phase_2_features": 20,
+    "phase_2_features": 21,
     "merged_features": 2,
     "not_started": 0,
-    "failing": 31,
+    "failing": 32,
     "merged": 2,
     "in_progress": 0,
     "passing": 5,
     "reverted": 0,
-    "progress_percentage": 13.5
+    "progress_percentage": 13.2
   },
   "session_log": [
     {
@@ -246,6 +288,26 @@
       "features_completed": [],
       "commits": [],
       "notes": "Implemented F23a cloudron_validate_manifest: Added ManifestValidationResult type to types.ts (valid, errors[], warnings[]), extended AppManifest with minBoxVersion/memoryLimit/addons fields, added cloudron_validate_manifest tool to server.ts (tool definition + handler), implemented CloudronClient.validateManifest() method with F36 checkStorage integration. Created comprehensive Jest test suite (11 tests, 7 passing). Implementation complete and functional (build succeeds, tool works), but 4 test failures due to mock structure complexity (SystemStatus disk format uses bytes, tests initially used MB). Status: failing (tried_count=1), needs test mock refinement to achieve full passing status."
+    },
+    {
+      "session_id": "session_009",
+      "started_at": "2025-12-26T00:00:00Z",
+      "ended_at": "2025-12-26T00:15:00Z",
+      "agent_type": "worker",
+      "features_attempted": [],
+      "features_completed": [],
+      "commits": [],
+      "notes": "Added F38 cloudron_list_domains feature to Phase 2 based on community feedback. Updated domain memory: total_features 37→38, phase_2_features 20→21, failing 31→32, progress_percentage 13.5%→13.2%. Feature includes GET /api/v1/domains endpoint, Domain interface definition, test anchors for verification status and TLS config."
+    },
+    {
+      "session_id": "session_010",
+      "started_at": "2025-12-26T02:00:00Z",
+      "ended_at": "2025-12-26T04:00:00Z",
+      "agent_type": "worker",
+      "features_attempted": ["F23b", "F04"],
+      "features_completed": ["F23b", "F04"],
+      "commits": ["4246101"],
+      "notes": "CRITICAL SESSION: Real API testing revealed F23b and F04 bugs that mock tests completely missed. F23b: Fixed wrong endpoint (/apps/install→/apps), added missing domain parameter. F04: Fixed wrong HTTP method (DELETE→POST /apps/:id/uninstall). Successfully tested both tools with real Cloudron instance: installed Gogs app (test-f23b), verified async task tracking, uninstalled app. Published v0.2.0 to npm. Community feedback added F38. Stored critical lessons in CRITICAL_RULE_real_tests_only and CRITICAL_VIOLATION_direct_execution_2025_12_26 memories."
     }
   ],
   "technical_context": {
@@ -275,7 +337,7 @@
         "Merged F06/F30 into single cloudron_get_logs with type enum",
         "Merged F13/F15 into single cloudron_create_user with role parameter",
         "Prioritized 10 MVP features (Phase 1) for 200-300 min total effort",
-        "Deferred 23 features to Phase 2 after MVP proves value"
+        "Deferred 24 features to Phase 2 after MVP proves value"
       ]
     },
     "api_endpoints": [
@@ -296,7 +358,8 @@
       "GET /api/v1/appstore - Search app store (F22)",
       "POST /api/v1/apps - Install app (F23b)",
       "GET /api/v1/tasks/:id - Get task status (F34)",
-      "DELETE /api/v1/tasks/:id - Cancel task (F35)"
+      "DELETE /api/v1/tasks/:id - Cancel task (F35)",
+      "GET /api/v1/domains - List domains (F38)"
     ],
     "external_dependencies": [
       "@modelcontextprotocol/sdk v1.24.3 - MCP protocol implementation",
@@ -328,9 +391,9 @@
         "status": "in_progress"
       },
       "phase_2": {
-        "features": 20,
+        "features": 21,
         "effort_estimate": "TBD after Phase 1 completion",
-        "description": "Deferred features (F09, F11, F14, F16-F21, F24-F29, F31-F33)",
+        "description": "Deferred features (F09, F11, F14, F16-F21, F24-F29, F31-F33, F38)",
         "status": "deferred"
       }
     }
