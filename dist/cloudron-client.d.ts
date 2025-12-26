@@ -3,7 +3,7 @@
  * MVP scope: listApps + getApp endpoints
  * DI-enabled for testing
  */
-import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult, Backup, AppStoreApp, User, LogType, LogEntry, AppConfig, ConfigureAppResponse, ManifestValidationResult } from './types.js';
+import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult, Backup, AppStoreApp, User, LogType, LogEntry, AppConfig, ConfigureAppResponse, ManifestValidationResult, InstallAppParams } from './types.js';
 export declare class CloudronClient {
     private readonly baseUrl;
     private readonly token;
@@ -184,5 +184,12 @@ export declare class CloudronClient {
      * @returns Validation result with errors and warnings
      */
     validateManifest(appId: string, requiredMB?: number): Promise<ManifestValidationResult>;
+    /**
+     * Install an application from the App Store (F23b with pre-flight validation)
+     * POST /api/v1/apps/install
+     * @param params - Installation parameters (manifestId, location, optional config)
+     * @returns Task ID for tracking installation progress via getTaskStatus()
+     */
+    installApp(params: InstallAppParams): Promise<string>;
 }
 //# sourceMappingURL=cloudron-client.d.ts.map
