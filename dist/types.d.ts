@@ -33,6 +33,16 @@ export interface ManifestValidationResult {
     warnings: string[];
 }
 /**
+ * App installation parameters for F23b
+ */
+export interface InstallAppParams {
+    manifestId: string;
+    location: string;
+    portBindings?: Record<string, number>;
+    accessRestriction?: string;
+    env?: Record<string, string>;
+}
+/**
  * Cloudron App representation
  */
 export interface App {
