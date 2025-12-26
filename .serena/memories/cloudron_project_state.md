@@ -2,15 +2,12 @@
 
 **Project**: MCP server for Cloudron instance management  
 **Location**: `/home/blackthorne/Work/cloudron`  
-**Status**: Phase 4 COMPLETE - Open Source Release Live  
+**Status**: Phase 1 NEARLY COMPLETE (13/14 features) - 40.5% total progress  
 **Last Updated**: 2025-12-23
 
 ## Project Overview
 
-TypeScript-based MCP server that enables Claude to manage Cloudron instances through three core tools:
-- `cloudron_list_apps` - List all installed applications
-- `cloudron_get_app` - Get detailed app information by ID  
-- `cloudron_get_status` - Get Cloudron instance status and configuration
+TypeScript-based MCP server that enables Claude to manage Cloudron instances through MCP tools.
 
 ## Current Status
 
@@ -20,121 +17,140 @@ TypeScript-based MCP server that enables Claude to manage Cloudron instances thr
 - **License**: MIT
 - **Integration**: Claude Code via Docker MCP Gateway (npx method)
 
-### Phase Completion
+### Feature Development Progress
 
-✅ **Phase 1**: Research & Architecture (COMPLETE)
-- Cloudron API documentation analyzed
-- MCP protocol specifications reviewed
-- Architecture decisions documented
+**15/37 features passing (40.5%)** 🎉
 
-✅ **Phase 2**: Core Implementation (COMPLETE)  
-- TypeScript MCP server with 3 tools
-- Cloudron API client with authentication
-- Error handling and type definitions
+#### Phase 0: Foundation (COMPLETE)
+✅ **F00**: Test harness infrastructure (Jest, automated testing)
 
-✅ **Phase 3**: Testing & Integration (COMPLETE)
-- All 3 tools tested successfully against live Cloudron instance
-- Docker MCP Gateway integration verified
-- Claude Code integration working
+#### Phase 1: MVP + Safety (13/14 COMPLETE - 92.9%)
 
-✅ **Phase 4**: Open Source Release (COMPLETE - 2025-12-23)
-- npm package published as @serenichron/mcp-cloudron
-- GitHub repository created with full documentation
-- README.md with badges (npm, MIT, MCP)
-- LICENSE (MIT) added
-- CONTRIBUTING.md created
-- .npmignore configured
-- Asana task marked complete
-- Community announcement posted to Cloudron Forum
+**MVP Features (10/10 COMPLETE)**:
+1. ✅ **F01**: App lifecycle control (merged F01/F02/F03) - start/stop/restart with action enum
+2. ✅ **F04**: Uninstall app with F37 pre-flight validation
+3. ✅ **F05**: Configure app (env vars, resource limits, access control)
+4. ✅ **F22**: Search Cloudron App Store
+5. ✅ **F23a**: Validate app manifest (pre-flight safety)
+6. ⏳ **F23b**: Install app (BLOCKED - agent implemented F23a dependency first)
+7. ✅ **F07**: List backups
+8. ✅ **F08**: Create backup with F36 storage check (merged F08/F10)
+9. ✅ **F12**: List users
+10. ✅ **F13**: Create user with role (merged F13/F15)
+11. ✅ **F06**: Get logs (merged F06/F30) - app/service with type enum
 
-### Security Incident (RESOLVED)
+**Safety Infrastructure (4/4 COMPLETE)**:
+12. ✅ **F34**: Task status tracking for async operations
+13. ✅ **F35**: Cancel task (kill switch)
+14. ✅ **F36**: Storage check (pre-flight disk space validation)
+15. ✅ **F37**: Validate operation (pre-flight safety for destructive operations)
 
-**Issue**: GitGuardian detected exposed Cloudron API token in git history
-- **Token exposed**: `b12818369ddc...` (64-char hex, now rotated)
-- **Fix applied**: Used `git filter-repo --path .env --invert-paths` to clean history
-- **Result**: Clean git history pushed to GitHub, user rotated token
-- **Status**: Incident closed, new token active
+**Phase 1 Status**: 13/14 features complete (92.9%)
+**Remaining**: F23b only (dependencies now satisfied: F23a ✅, F36 ✅)
+
+#### Phase 2: Deferred Features (0/20 COMPLETE)
+- F09: Restore backup
+- F11: Configure backup schedules
+- F14: Delete user
+- F16-F21: Domain management (6 features)
+- F24-F29: Email/system management (6 features)
+- F31-F33: System updates (3 features)
+
+### Test Coverage
+
+- **Total Tests**: 179 passing, 0 failing
+- **Statements**: 91.83%
+- **Branches**: 76.13%
+- **Functions**: 88.88%
+- **Lines**: 91.83%
+- **Test Framework**: Jest 29.x with TypeScript
+
+### Recent Git Commits
+
+- `4354a47` - feat(api): implement F23a cloudron_validate_manifest tool
+- `2405625` - feat(api): implement F08 cloudron_create_backup tool
+- `62f65e8` - feat(api): implement F04 cloudron_uninstall_app tool
+- `b0b7fdd` - feat(api): implement F35 cloudron_cancel_task tool
+- `5a72f2c` - feat(api): implement F06 cloudron_get_logs tool (merged F06/F30)
+- `43c0b4b` - feat(api): implement F13 cloudron_create_user tool (merged F13/F15)
+- `23fd90f` - feat(api): implement F05 cloudron_configure_app tool
+- `2dce7db` - feat(api): implement F07 cloudron_list_backups tool
+- `013dd02` - feat(api): implement F22 cloudron_search_apps tool
+- `200146f` - feat(api): implement F01 cloudron_control_app tool (merged F01/F02/F03)
+- `09c3638` - feat(api): implement F37 cloudron_validate_operation tool
+- `7c97681` - feat(api): implement F34 task_status + F36 check_storage tools
+- `ccc8e7d` - feat(F00): implement Jest test harness infrastructure
 
 ## Technical Stack
 
 - **Language**: TypeScript 5.9.3 (strict mode)
-- **Runtime**: Node.js ≥18.0.0
+- **Runtime**: Node.js ≥18.0.0 (LTS)
 - **MCP SDK**: @modelcontextprotocol/sdk v1.24.3
 - **Transport**: stdio (StdioServerTransport)
+- **Testing**: Jest 29.x with ts-jest
 - **Build**: tsc compiler
-- **Package Manager**: npm
 
-## File Structure
+## Domain Memory Architecture
 
-```
-/home/blackthorne/Work/cloudron/
-├── src/
-│   ├── server.ts          # MCP server with tool handlers
-│   ├── cloudron-client.ts # Cloudron API client
-│   ├── types.ts           # TypeScript type definitions
-│   ├── errors.ts          # Error handling
-│   └── test.ts            # Manual test script
-├── dist/                  # Compiled JavaScript (gitignored)
-├── package.json           # npm package config (@serenichron/mcp-cloudron)
-├── tsconfig.json          # TypeScript strict mode config
-├── LICENSE                # MIT license
-├── README.md              # Full documentation with badges
-├── CONTRIBUTING.md        # Contribution guidelines
-├── .npmignore             # npm publish exclusions
-├── .gitignore             # Git exclusions (.env, dist/, node_modules/)
-└── .env                   # Cloudron credentials (gitignored, cleaned from history)
-```
+**Following**: Anthropic "Memory Moat" pattern
+- **File**: domain_memory_cloudron (Serena)
+- **Features**: 37 total (15 passing, 22 failing/deferred)
+- **Format**: JSON schema with features, goals, progress, session logs, technical context
+- **Agent Pattern**: Initializer (session 1) + Worker (subsequent sessions)
 
-## Environment Configuration
+## MAGI Review Integration (2025-12-23)
 
-**Required Variables** (in .env or Docker MCP config):
-- `CLOUDRON_BASE_URL`: Cloudron instance URL (e.g., https://my.serenichron.agency)
-- `CLOUDRON_API_TOKEN`: API token from Cloudron Admin Panel → Settings → API Tokens
+**Hybrid Approach Implemented** (Option D):
+- ✅ Melchior (Strategic): F00 test harness as BLOCKING, strengthened test anchors
+- ✅ Balthasar (Safety): F36/F37 safety gates, F23 split, hardened dependencies
+- ✅ Caspar (Pragmatic): Merged 5 feature groups, prioritized 10 MVP features
 
-**Current Integration** (~/.docker/mcp/config.yaml):
-```yaml
-mcpServers:
-  cloudron:
-    command: npx
-    args: ["@serenichron/mcp-cloudron"]
-    env:
-      CLOUDRON_BASE_URL: "https://my.serenichron.agency"
-      CLOUDRON_API_TOKEN: "[REDACTED - User has rotated]"
-```
+**Feature Merges Applied**:
+- F01+F02+F03 → cloudron_control_app (action enum)
+- F06+F30 → cloudron_get_logs (type enum)
+- F08+F10 → cloudron_create_backup (status included)
+- F13+F15 → cloudron_create_user (role param)
+- F23 → F23a (validate) + F23b (install)
+
+**New Safety Features Added**:
+- F34: Task status tracking
+- F35: Cancel task
+- F36: Storage check (pre-flight)
+- F37: Validate operation (pre-flight)
 
 ## MCP Tools Specification
 
-### 1. cloudron_list_apps
-**Purpose**: List all installed applications on Cloudron instance  
-**Parameters**: None  
-**Returns**: Array of apps with name, domain, ID, state, health, memory  
-**Tested**: ✅ Working (returned 6 apps from live instance)
+### Existing Tools (v0.1.0 - Published)
+1. **cloudron_list_apps** - List all installed applications
+2. **cloudron_get_app** - Get app details by ID
+3. **cloudron_get_status** - Get instance status
 
-### 2. cloudron_get_app  
-**Purpose**: Get detailed information about specific application  
-**Parameters**: `appId` (string, required)  
-**Returns**: App details including name, domain, state, health, memory  
-**Tested**: ✅ Working (retrieved Baserow app details)
+### New Tools (v0.2.0 - In Development)
 
-### 3. cloudron_get_status
-**Purpose**: Get Cloudron instance status and configuration  
-**Parameters**: None  
-**Returns**: Instance name, version, admin URL, provider, demo mode  
-**Tested**: ✅ Working (returned Cloudron 9.0.13 status)
+**App Management** (7 tools):
+4. **cloudron_control_app** - Start/stop/restart apps (action enum)
+5. **cloudron_configure_app** - Update app configuration
+6. **cloudron_uninstall_app** - Uninstall app with pre-flight validation
+7. **cloudron_search_apps** - Search Cloudron App Store
+8. **cloudron_validate_manifest** - Validate app manifest before install
+9. **cloudron_install_app** - Install app (F23b - pending)
+10. **cloudron_get_logs** - Get app or service logs (type enum)
 
-## Cloudron API Integration
+**Backup Management** (2 tools):
+11. **cloudron_list_backups** - List all backups
+12. **cloudron_create_backup** - Create backup with storage check
 
-**Base URL**: Configured via CLOUDRON_BASE_URL environment variable  
-**Authentication**: Bearer token in Authorization header  
-**Endpoints Used**:
-- `GET /api/v1/apps` - List applications
-- `GET /api/v1/apps/:id` - Get app by ID  
-- `GET /api/v1/cloudron/status` - Get instance status
+**User Management** (2 tools):
+13. **cloudron_list_users** - List all users
+14. **cloudron_create_user** - Create user with role
 
-**Error Handling**:
-- Network errors caught and formatted
-- API errors include status codes
-- Configuration validation on client initialization
+**Infrastructure** (4 tools):
+15. **cloudron_task_status** - Track async operation status
+16. **cloudron_cancel_task** - Cancel running task
+17. **cloudron_check_storage** - Pre-flight disk space check
+18. **cloudron_validate_operation** - Pre-flight safety validation
+
+**Total**: 18 tools (3 published + 15 new)
 
 ## Development Workflow
 
@@ -142,24 +158,77 @@ mcpServers:
 ```bash
 npm install           # Install dependencies
 npm run build         # Compile TypeScript
+npm test              # Run automated tests (179 passing)
+npm run test:coverage # Generate coverage report
 npm start             # Run server (stdio)
-npm test              # Manual test against live instance
-npm run dev           # Watch mode (tsx)
 ```
 
-### Publishing to npm
-```bash
-npm run build                                    # Compile to dist/
-npm publish --access public                      # Publish scoped package
-# Note: Requires npm authentication (user published manually via browser due to security key 2FA)
-```
+### Worker Session Pattern
+1. **Bootup Ritual** (6 steps): pwd, load domain memory, check progress, identify feature, load steps, confirm ready
+2. **Feature Implementation**: ONE feature per session (20-30 min avg)
+3. **Automated Testing**: Jest tests (not manual test.ts)
+4. **Domain Memory Update**: Status, test results, git commit
+5. **Git Commit**: Conventional commits (feat/fix/docs/test)
 
 ### Git Workflow
 ```bash
 git add .
-git commit -m "feat: description"               # Conventional commits
+git commit -m "feat(api): implement F## tool_name"
 git push origin master
 ```
+
+## Success Metrics
+
+- ✅ 15/37 features passing (40.5%)
+- ✅ Phase 0 complete (1/1 features)
+- ✅ Phase 1 nearly complete (13/14 features, 92.9%)
+- ✅ Test coverage >90% lines
+- ✅ All test anchors validated with specific assertions
+- ✅ MAGI consensus applied (hybrid approach)
+- ✅ Safety infrastructure operational (F34-F37)
+
+## Next Steps
+
+### Immediate (Complete Phase 1)
+1. **F23b**: cloudron_install_app (dependencies satisfied: F23a ✅, F36 ✅)
+   - Estimated effort: 35 minutes
+   - All dependencies complete
+   - Final Phase 1 feature
+
+### Phase 2 (After F23b)
+2. **Publish v0.2.0** to npm with 15 new tools
+3. **Update README.md** with new tool documentation
+4. **Evaluate Phase 2 priority** based on user feedback
+5. **Community engagement** (monitor GitHub issues, forum responses)
+
+## Session History
+
+**Session 1-2** (2025-12-10 to 2025-12-11): Initial research, architecture, implementation
+**Session 3** (2025-12-23): Open source release, Phase 4 complete
+**Session 4** (2025-12-23): MAGI review, domain memory update, Phase 1 implementation
+- F00 implemented (test harness foundation)
+- F34, F36 implemented in parallel (safety infrastructure)
+- F37 implemented (validate operation)
+- F01, F22, F07, F12 implemented in parallel (simple read operations)
+- F05, F13, F06, F35 implemented in parallel (complex operations)
+- F04, F08, F23a implemented in parallel (final batch)
+- **Progress**: 15/37 features (40.5%), 13/14 Phase 1 features complete
+
+## Key Learnings
+
+1. **Worker Pattern Success**: Stateless workers implementing ONE feature atomically works exceptionally well
+2. **Parallel Execution**: Spawning independent workers in same message (not separate) gives 90%+ time reduction
+3. **MAGI Hybrid Approach**: Satisfies all three perspectives (strategic, safety, pragmatic)
+4. **Safety Gates**: F36/F37 pre-flight validation prevents destructive errors
+5. **Test-First**: Automated Jest tests (not manual) enable CI/CD and regression detection
+6. **Feature Merges**: Consolidating redundant operations (F01/F02/F03, F06/F30, etc.) reduces complexity
+
+## Asana Integration
+
+**Workspace**: Serenichron (gid: 1209371498667366)  
+**Project**: Cloudron MCP Integration  
+**Task**: "Cloudron MCP Server - Full Development & Release" (gid: 1209371574206093)  
+**Status**: In Progress (Phase 1 at 92.9%)
 
 ## Community Engagement
 
@@ -167,74 +236,25 @@ git push origin master
 - Announcement of MCP server availability
 - Installation instructions
 - Invitation to fork/extend/file issues
-- Links to npm package and GitHub repo
 
 **Community Resources**:
 - 💬 Cloudron Forum: https://forum.cloudron.io
-- 🐛 GitHub Issues: https://github.com/serenichron/mcp-cloudron/issues  
+- 🐛 GitHub Issues: https://github.com/serenichron/mcp-cloudron/issues
 - 💡 Feature Requests: https://github.com/serenichron/mcp-cloudron/issues/new?labels=enhancement
 
-## Roadmap (Future Phases)
+## Roadmap
 
-Potential future enhancements (community-driven):
-- [ ] App lifecycle management (start, stop, restart)
-- [ ] Backup operations (create, restore, schedule)
-- [ ] User management (list, create, delete users)
-- [ ] Domain configuration (add, remove, configure domains)
-- [ ] App installation from Cloudron App Store
-- [ ] Email configuration management
-- [ ] System updates and maintenance
+**v0.2.0** (Current - In Development):
+- 15 new MCP tools across app management, backups, users, infrastructure
+- Automated test suite (179 tests passing)
+- Safety gates (pre-flight validation)
+- Async operation tracking
 
-## Asana Integration
+**v0.3.0** (Phase 2 - Future):
+- Backup restore operations
+- Domain management
+- Email configuration
+- System updates
+- Community-driven feature requests
 
-**Workspace**: Serenichron (gid: 1209371498667366)  
-**Project**: Cloudron MCP Integration  
-**Task**: "Cloudron MCP Server - Full Development & Release" (gid: 1209371574206093)  
-**Status**: ✅ Marked complete (2025-12-23)
-
-## Session History
-
-**Session 1** (2025-12-10): Initial research and architecture
-- Deep research on Cloudron API and MCP protocol
-- Project initialization with Asana integration
-- Architecture decisions documented
-
-**Session 2** (2025-12-11): Core implementation
-- TypeScript MCP server built
-- 3 tools implemented and tested
-- Docker MCP Gateway integration
-
-**Session 3** (2025-12-23): Open source release
-- npm package published
-- GitHub repository created with full documentation
-- Security incident resolved (exposed token cleaned from history)
-- Community announcement posted
-- Phase 4 completed
-
-## Key Learnings
-
-1. **MCP SDK**: StdioServerTransport is straightforward for CLI integration
-2. **TypeScript Strict Mode**: Catches type errors early, improves reliability
-3. **Docker MCP Gateway**: npx method simplifies distribution (no local builds)
-4. **Security**: Never commit .env files; use git filter-repo for history cleanup
-5. **npm 2FA**: Automation tokens still require OTP if account has 2FA enabled; manual browser publish works with security keys
-6. **Community**: Open source documentation (README, CONTRIBUTING) critical for adoption
-
-## Success Metrics
-
-- ✅ All 3 MCP tools working against live Cloudron instance
-- ✅ Successfully published to npm registry
-- ✅ GitHub repository public with comprehensive documentation
-- ✅ Security incident resolved with no lingering exposed credentials
-- ✅ Community announcement posted and acknowledged
-- ✅ Claude Code integration functional via npx method
-
-## Next Steps (User-Driven)
-
-Project is in maintenance mode. Future work would be reactive based on:
-- Community feedback from Cloudron Forum
-- GitHub issues or feature requests  
-- npm adoption metrics (downloads, stars)
-- Bug reports from users
-
-**No immediate action required.**
+**Status**: Ready to complete Phase 1 (F23b only), then evaluate Phase 2 priorities.
