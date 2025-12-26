@@ -115,8 +115,8 @@ export declare class CloudronClient {
     configureApp(appId: string, config: AppConfig): Promise<ConfigureAppResponse>;
     /**
      * Uninstall an application (DESTRUCTIVE OPERATION)
-     * DELETE /api/v1/apps/:id
-     * Returns 202 Accepted with task ID for async operation tracking
+     * POST /api/v1/apps/:id/uninstall
+     * Returns task ID for async operation tracking
      * Performs pre-flight validation via F37 before proceeding
      */
     uninstallApp(appId: string): Promise<{

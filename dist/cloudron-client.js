@@ -298,8 +298,8 @@ export class CloudronClient {
     }
     /**
      * Uninstall an application (DESTRUCTIVE OPERATION)
-     * DELETE /api/v1/apps/:id
-     * Returns 202 Accepted with task ID for async operation tracking
+     * POST /api/v1/apps/:id/uninstall
+     * Returns task ID for async operation tracking
      * Performs pre-flight validation via F37 before proceeding
      */
     async uninstallApp(appId) {
@@ -314,7 +314,7 @@ export class CloudronClient {
             throw new CloudronError(errorMessage);
         }
         // Proceed with uninstall if validation passes
-        return await this.makeRequest('DELETE', `/api/v1/apps/${encodeURIComponent(appId)}`);
+        return await this.makeRequest('POST', `/api/v1/apps/${encodeURIComponent(appId)}/uninstall`);
     }
     /**
      * Get task status for async operations
