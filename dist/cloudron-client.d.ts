@@ -54,7 +54,7 @@ export declare class CloudronClient {
     listUsers(): Promise<User[]>;
     /**
      * Search Cloudron App Store for available applications
-     * GET /api/v1/appstore?search={query}
+     * GET /api/v1/appstore/apps?search={query}
      * @param query - Optional search query (empty returns all apps)
      * @returns Array of app store apps sorted by relevance score
      */
