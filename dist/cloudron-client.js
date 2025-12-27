@@ -164,14 +164,14 @@ export class CloudronClient {
     }
     /**
      * Search Cloudron App Store for available applications
-     * GET /api/v1/appstore?search={query}
+     * GET /api/v1/appstore/apps?search={query}
      * @param query - Optional search query (empty returns all apps)
      * @returns Array of app store apps sorted by relevance score
      */
     async searchApps(query) {
         const endpoint = query
-            ? `/api/v1/appstore?search=${encodeURIComponent(query)}`
-            : '/api/v1/appstore';
+            ? `/api/v1/appstore/apps?search=${encodeURIComponent(query)}`
+            : '/api/v1/appstore/apps';
         const response = await this.makeRequest('GET', endpoint);
         // Sort results by relevance score (highest first) if available
         const apps = response.apps || [];
