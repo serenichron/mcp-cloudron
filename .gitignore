@@ -1,4 +1,17 @@
+# Build outputs
 node_modules/
 dist/
+coverage/
+
+# AI agent files
+.serena/
+
+# Temp documentation (use AGENTS.md and CHANGELOG.md only)
+FORUM_POST.md
+PHASE_*.md
+TESTING*.md
+REAL_*.md
+
+# Environment
 .env
 .mcp.json
