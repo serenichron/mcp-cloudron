@@ -351,7 +351,7 @@ describe('F23a: cloudron_validate_manifest', () => {
       // Step 1: searchApps to fetch manifest
       expect(mockFetch).toHaveBeenNthCalledWith(
         1,
-        'https://test.cloudron.io/api/v1/appstore?search=io.wordpress.cloudron',
+        'https://test.cloudron.io/api/v1/appstore/apps?search=io.wordpress.cloudron',
         expect.objectContaining({
           method: 'GET',
         })

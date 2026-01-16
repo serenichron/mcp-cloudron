@@ -61,7 +61,7 @@ describe('cloudron_search_apps tool', () => {
   it('should search apps with query and return sorted results', async () => {
     // Mock API response
     global.fetch = createMockFetch({
-      'GET https://my.example.com/api/v1/appstore?search=wordpress': {
+      'GET https://my.example.com/api/v1/appstore/apps?search=wordpress': {
         ok: true,
         status: 200,
         data: { apps: [mockAppStoreApps[0]] }
@@ -94,7 +94,7 @@ describe('cloudron_search_apps tool', () => {
 
   it('should return all apps when query is empty', async () => {
     global.fetch = createMockFetch({
-      'GET https://my.example.com/api/v1/appstore': {
+      'GET https://my.example.com/api/v1/appstore/apps': {
         ok: true,
         status: 200,
         data: { apps: mockAppStoreApps }
@@ -114,7 +114,7 @@ describe('cloudron_search_apps tool', () => {
 
   it('should return empty array when no results found', async () => {
     global.fetch = createMockFetch({
-      'GET https://my.example.com/api/v1/appstore?search=nonexistent': {
+      'GET https://my.example.com/api/v1/appstore/apps?search=nonexistent': {
         ok: true,
         status: 200,
         data: { apps: [] }
@@ -137,7 +137,7 @@ describe('cloudron_search_apps tool', () => {
     ];
 
     global.fetch = createMockFetch({
-      'GET https://my.example.com/api/v1/appstore?search=test': {
+      'GET https://my.example.com/api/v1/appstore/apps?search=test': {
         ok: true,
         status: 200,
         data: { apps: unsortedApps }
@@ -163,7 +163,7 @@ describe('cloudron_search_apps tool', () => {
     };
 
     global.fetch = createMockFetch({
-      'GET https://my.example.com/api/v1/appstore?search=minimal': {
+      'GET https://my.example.com/api/v1/appstore/apps?search=minimal': {
         ok: true,
         status: 200,
         data: { apps: [minimalApp] }
@@ -181,7 +181,7 @@ describe('cloudron_search_apps tool', () => {
 
   it('should handle API authentication error', async () => {
     global.fetch = createMockFetch({
-      'GET https://my.example.com/api/v1/appstore': {
+      'GET https://my.example.com/api/v1/appstore/apps': {
         ok: false,
         status: 401,
         data: { message: 'Invalid API token' }
@@ -195,7 +195,7 @@ describe('cloudron_search_apps tool', () => {
 
   it('should handle API server error', async () => {
     global.fetch = createMockFetch({
-      'GET https://my.example.com/api/v1/appstore?search=test': {
+      'GET https://my.example.com/api/v1/appstore/apps?search=test': {
         ok: false,
         status: 500,
         data: { message: 'Internal server error' }
@@ -212,7 +212,7 @@ describe('cloudron_search_apps tool', () => {
     const encodedQuery = encodeURIComponent(specialQuery);
 
     global.fetch = createMockFetch({
-      [`GET https://my.example.com/api/v1/appstore?search=${encodedQuery}`]: {
+      [`GET https://my.example.com/api/v1/appstore/apps?search=${encodedQuery}`]: {
         ok: true,
         status: 200,
         data: { apps: [] }

@@ -34,9 +34,9 @@ describe('F23b: cloudron_install_app', () => {
       // Mock API responses:
       // 1. GET /api/v1/appstore (F23a manifest check)
       // 2. GET /api/v1/cloudron/status (F36 storage check within F23a)
-      // 3. POST /api/v1/apps/install (actual installation)
+      // 3. POST /api/v1/apps (actual installation)
       global.fetch = createMockFetch({
-        'GET https://my.example.com/api/v1/appstore?search=io.example.app': {
+        'GET https://my.example.com/api/v1/appstore/apps?search=io.example.app': {
           ok: true,
           status: 200,
           data: {
@@ -58,7 +58,7 @@ describe('F23b: cloudron_install_app', () => {
           status: 200,
           data: mockCloudronStatus, // Has sufficient storage
         },
-        'POST https://my.example.com/api/v1/apps/install': {
+        'POST https://my.example.com/api/v1/apps': {
           ok: true,
           status: 202,
           data: { taskId: 'task-install-12345' },
@@ -78,7 +78,7 @@ describe('F23b: cloudron_install_app', () => {
 
     it('should reject installation when F23a validation fails (app not found)', async () => {
       global.fetch = createMockFetch({
-        'GET https://my.example.com/api/v1/appstore?search=io.nonexistent.app': {
+        'GET https://my.example.com/api/v1/appstore/apps?search=io.nonexistent.app': {
           ok: true,
           status: 200,
           data: { apps: [] }, // App not found
@@ -119,7 +119,7 @@ describe('F23b: cloudron_install_app', () => {
       };
 
       global.fetch = createMockFetch({
-        'GET https://my.example.com/api/v1/appstore?search=io.example.app': {
+        'GET https://my.example.com/api/v1/appstore/apps?search=io.example.app': {
           ok: true,
           status: 200,
           data: {
@@ -196,7 +196,7 @@ describe('F23b: cloudron_install_app', () => {
   describe('Test Anchor: Installation parameters', () => {
     it('should install app with required parameters only', async () => {
       global.fetch = createMockFetch({
-        'GET https://my.example.com/api/v1/appstore?search=io.example.app': {
+        'GET https://my.example.com/api/v1/appstore/apps?search=io.example.app': {
           ok: true,
           status: 200,
           data: {
@@ -218,7 +218,7 @@ describe('F23b: cloudron_install_app', () => {
           status: 200,
           data: mockCloudronStatus,
         },
-        'POST https://my.example.com/api/v1/apps/install': {
+        'POST https://my.example.com/api/v1/apps': {
           ok: true,
           status: 202,
           data: { taskId: 'task-basic-install' },
@@ -279,11 +279,11 @@ describe('F23b: cloudron_install_app', () => {
 
       // Verify POST body includes optional parameters
       const installCall = mockFetch.mock.calls.find((call) =>
-        call[0].includes('/api/v1/apps/install')
+        call[0].includes('/api/v1/apps') && call[1]?.method === 'POST'
       );
       expect(installCall).toBeDefined();
 
-      const requestBody = JSON.parse(installCall![1].body);
+      const requestBody = JSON.parse(installCall![1].body as string);
       expect(requestBody).toEqual({
         appStoreId: 'io.example.app',
         location: 'myapp',
@@ -331,7 +331,7 @@ describe('F23b: cloudron_install_app', () => {
   describe('Test Anchor: Task ID return (F34 integration)', () => {
     it('should return task ID for F34 tracking', async () => {
       global.fetch = createMockFetch({
-        'GET https://my.example.com/api/v1/appstore?search=io.example.app': {
+        'GET https://my.example.com/api/v1/appstore/apps?search=io.example.app': {
           ok: true,
           status: 200,
           data: {
@@ -353,7 +353,7 @@ describe('F23b: cloudron_install_app', () => {
           status: 200,
           data: mockCloudronStatus,
         },
-        'POST https://my.example.com/api/v1/apps/install': {
+        'POST https://my.example.com/api/v1/apps': {
           ok: true,
           status: 202,
           data: { taskId: 'task-async-install-001' },
@@ -373,7 +373,7 @@ describe('F23b: cloudron_install_app', () => {
 
     it('should throw error when installation API returns 202 but missing taskId', async () => {
       global.fetch = createMockFetch({
-        'GET https://my.example.com/api/v1/appstore?search=io.example.app': {
+        'GET https://my.example.com/api/v1/appstore/apps?search=io.example.app': {
           ok: true,
           status: 200,
           data: {
@@ -395,7 +395,7 @@ describe('F23b: cloudron_install_app', () => {
           status: 200,
           data: mockCloudronStatus,
         },
-        'POST https://my.example.com/api/v1/apps/install': {
+        'POST https://my.example.com/api/v1/apps': {
           ok: true,
           status: 202,
           data: {}, // Missing taskId
@@ -422,7 +422,7 @@ describe('F23b: cloudron_install_app', () => {
   describe('Test Anchor: Error handling', () => {
     it('should handle installation API authentication error (401)', async () => {
       global.fetch = createMockFetch({
-        'GET https://my.example.com/api/v1/appstore?search=io.example.app': {
+        'GET https://my.example.com/api/v1/appstore/apps?search=io.example.app': {
           ok: true,
           status: 200,
           data: {
@@ -444,7 +444,7 @@ describe('F23b: cloudron_install_app', () => {
           status: 200,
           data: mockCloudronStatus,
         },
-        'POST https://my.example.com/api/v1/apps/install': {
+        'POST https://my.example.com/api/v1/apps': {
           ok: false,
           status: 401,
           data: { message: 'Invalid token' },
@@ -463,7 +463,7 @@ describe('F23b: cloudron_install_app', () => {
 
     it('should handle installation API server error (500)', async () => {
       global.fetch = createMockFetch({
-        'GET https://my.example.com/api/v1/appstore?search=io.example.app': {
+        'GET https://my.example.com/api/v1/appstore/apps?search=io.example.app': {
           ok: true,
           status: 200,
           data: {
@@ -485,7 +485,7 @@ describe('F23b: cloudron_install_app', () => {
           status: 200,
           data: mockCloudronStatus,
         },
-        'POST https://my.example.com/api/v1/apps/install': {
+        'POST https://my.example.com/api/v1/apps': {
           ok: false,
           status: 500,
           data: { message: 'Installation service unavailable' },
@@ -540,9 +540,9 @@ describe('F23b: cloudron_install_app', () => {
         location: 'myapp',
       });
 
-      // Verify POST /api/v1/apps/install called
+      // Verify POST /api/v1/apps called
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://my.example.com/api/v1/apps/install',
+        'https://my.example.com/api/v1/apps',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
@@ -558,7 +558,7 @@ describe('F23b: cloudron_install_app', () => {
       const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
 
       global.fetch = createMockFetch({
-        'GET https://my.example.com/api/v1/appstore?search=io.example.app': {
+        'GET https://my.example.com/api/v1/appstore/apps?search=io.example.app': {
           ok: true,
           status: 200,
           data: {
@@ -580,7 +580,7 @@ describe('F23b: cloudron_install_app', () => {
           status: 200,
           data: mockCloudronStatus,
         },
-        'POST https://my.example.com/api/v1/apps/install': {
+        'POST https://my.example.com/api/v1/apps': {
           ok: true,
           status: 202,
           data: { taskId: 'task-workflow-complete' },
