@@ -3,7 +3,7 @@
  * MVP scope: listApps + getApp endpoints
  * DI-enabled for testing
  */
-import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult, Backup, AppStoreApp, User, LogType, LogEntry, AppConfig, ConfigureAppResponse, ManifestValidationResult, InstallAppParams, Domain } from './types.js';
+import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult, Backup, AppStoreApp, User, UpdateUserParams, LogType, LogEntry, AppConfig, ConfigureAppResponse, ManifestValidationResult, InstallAppParams, Domain } from './types.js';
 export declare class CloudronClient {
     private readonly baseUrl;
     private readonly token;
@@ -53,6 +53,37 @@ export declare class CloudronClient {
      */
     listUsers(): Promise<User[]>;
     /**
+     * Create a new Cloudron user with role assignment in a single atomic operation
+     * POST /api/v1/users
+     * @param email - User email address (valid format required)
+     * @param password - Password (8+ chars, 1 uppercase, 1 number)
+     * @param role - User role: 'admin', 'user', or 'guest'
+     * @returns The created user object
+     */
+    createUser(email: string, password: string, role: 'admin' | 'user' | 'guest'): Promise<User>;
+    /**
+     * Get detailed information about a specific user
+     * GET /api/v1/users/:userId
+     * @param userId - The user ID to retrieve
+     * @returns User object with full details
+     */
+    getUser(userId: string): Promise<User>;
+    /**
+     * Update an existing user's properties
+     * PUT /api/v1/users/:userId
+     * @param userId - The user ID to update
+     * @param params - User update parameters (email, displayName, password, role, groups - all optional)
+     * @returns The updated user object
+     */
+    updateUser(userId: string, params: UpdateUserParams): Promise<User>;
+    /**
+     * Delete a user from the Cloudron instance
+     * DELETE /api/v1/users/:userId
+     * @param userId - The user ID to delete
+     * @returns void on success
+     */
+    deleteUser(userId: string): Promise<void>;
+    /**
      * Search Cloudron App Store for available applications
      * GET /api/v1/appstore/apps?search={query}
      * @param query - Optional search query (empty returns all apps)
@@ -67,7 +98,6 @@ export declare class CloudronClient {
      * @param role - User role: 'admin', 'user', or 'guest'
      * @returns Created user object
      */
-    createUser(email: string, password: string, role: 'admin' | 'user' | 'guest'): Promise<User>;
     /**
      * List all configured domains on Cloudron instance
      * GET /api/v1/domains

@@ -163,6 +163,66 @@ export class CloudronClient {
         });
     }
     /**
+     * Create a new Cloudron user with role assignment in a single atomic operation
+     * POST /api/v1/users
+     * @param email - User email address (valid format required)
+     * @param password - Password (8+ chars, 1 uppercase, 1 number)
+     * @param role - User role: 'admin', 'user', or 'guest'
+     * @returns The created user object
+     */
+    async createUser(email, password, role) {
+        // Validate role first
+        const validRoles = ['admin', 'user', 'guest'];
+        if (!validRoles.includes(role)) {
+            throw new CloudronError(`Invalid role: ${role}. Valid options: admin, user, guest`);
+        }
+        // Validate password strength (8+ chars, 1 uppercase, 1 number)
+        if (!password || !this.isValidPassword(password)) {
+            throw new CloudronError('Password must be at least 8 characters long and contain at least 1 uppercase letter and 1 number');
+        }
+        // Validate email format
+        if (!email || !this.isValidEmail(email)) {
+            throw new CloudronError('Invalid email format');
+        }
+        const body = { email, password, role };
+        return await this.makeRequest('POST', '/api/v1/users', body);
+    }
+    /**
+     * Get detailed information about a specific user
+     * GET /api/v1/users/:userId
+     * @param userId - The user ID to retrieve
+     * @returns User object with full details
+     */
+    async getUser(userId) {
+        return await this.makeRequest('GET', `/api/v1/users/${encodeURIComponent(userId)}`);
+    }
+    /**
+     * Update an existing user's properties
+     * PUT /api/v1/users/:userId
+     * @param userId - The user ID to update
+     * @param params - User update parameters (email, displayName, password, role, groups - all optional)
+     * @returns The updated user object
+     */
+    async updateUser(userId, params) {
+        const body = {
+            ...(params.email && { email: params.email }),
+            ...(params.displayName && { displayName: params.displayName }),
+            ...(params.password && { password: params.password }),
+            ...(params.role && { role: params.role }),
+            ...(params.groups && { groups: params.groups }),
+        };
+        return await this.makeRequest('PUT', `/api/v1/users/${encodeURIComponent(userId)}`, body);
+    }
+    /**
+     * Delete a user from the Cloudron instance
+     * DELETE /api/v1/users/:userId
+     * @param userId - The user ID to delete
+     * @returns void on success
+     */
+    async deleteUser(userId) {
+        await this.makeRequest('DELETE', `/api/v1/users/${encodeURIComponent(userId)}`);
+    }
+    /**
      * Search Cloudron App Store for available applications
      * GET /api/v1/appstore/apps?search={query}
      * @param query - Optional search query (empty returns all apps)
@@ -189,25 +249,6 @@ export class CloudronClient {
      * @param role - User role: 'admin', 'user', or 'guest'
      * @returns Created user object
      */
-    async createUser(email, password, role) {
-        // Validate email format
-        if (!email || !this.isValidEmail(email)) {
-            throw new CloudronError('Invalid email format');
-        }
-        // Validate password strength (8+ chars, 1 uppercase, 1 number)
-        if (!this.isValidPassword(password)) {
-            throw new CloudronError('Password must be at least 8 characters long and contain at least 1 uppercase letter and 1 number');
-        }
-        // Validate role enum
-        if (!['admin', 'user', 'guest'].includes(role)) {
-            throw new CloudronError(`Invalid role: ${role}. Valid options: admin, user, guest`);
-        }
-        return await this.makeRequest('POST', '/api/v1/users', {
-            email,
-            password,
-            role,
-        });
-    }
     /**
      * List all configured domains on Cloudron instance
      * GET /api/v1/domains

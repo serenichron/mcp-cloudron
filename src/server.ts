@@ -219,7 +219,7 @@ const TOOLS = [
   },
   {
     name: 'cloudron_create_user',
-    description: 'Create a new user on the Cloudron instance with role assignment (atomic operation). Password must be at least 8 characters long and contain at least 1 uppercase letter and 1 number. Returns 201 Created with user object.',
+    description: 'Create a new user on the Cloudron instance with email, password, and role in a single atomic operation. Password must be at least 8 characters long and contain at least 1 uppercase letter and 1 number. Returns 201 Created with user object.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -229,15 +229,83 @@ const TOOLS = [
         },
         password: {
           type: 'string',
-          description: 'User password (8+ characters, 1 uppercase, 1 number)',
+          description: 'User password (minimum 8 characters, must contain at least 1 uppercase letter and 1 number)',
         },
         role: {
           type: 'string',
           enum: ['admin', 'user', 'guest'],
-          description: 'User role: admin (full access), user (standard access), or guest (limited access)',
+          description: 'User role: admin (full access), user (standard access), or guest (limited access). Default: user',
         },
       },
-      required: ['email', 'password', 'role'],
+      required: ['email', 'password'],
+    },
+  },
+  {
+    name: 'cloudron_get_user',
+    description: 'Get detailed information about a specific user by user ID. Returns user object with email, username, display name, role, groups, and timestamps.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        userId: {
+          type: 'string',
+          description: 'The user ID to retrieve',
+        },
+      },
+      required: ['userId'],
+    },
+  },
+  {
+    name: 'cloudron_update_user',
+    description: 'Update an existing user\'s properties including email, display name, password, role, or group membership. All fields are optional - only provided fields will be updated.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        userId: {
+          type: 'string',
+          description: 'The user ID to update',
+        },
+        email: {
+          type: 'string',
+          description: 'New email address (optional)',
+        },
+        displayName: {
+          type: 'string',
+          description: 'New display name (optional)',
+        },
+        password: {
+          type: 'string',
+          description: 'New password (minimum 8 characters, optional)',
+        },
+        role: {
+          type: 'string',
+          enum: ['admin', 'user', 'guest'],
+          description: 'New role (optional)',
+        },
+        groups: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'New groups array (optional)',
+        },
+      },
+      required: ['userId'],
+    },
+  },
+  {
+    name: 'cloudron_delete_user',
+    description: 'Delete a user from the Cloudron instance. WARNING: This is a destructive operation. Use cloudron_validate_operation before deletion to check for potential issues (last admin, owned apps). Requires confirmation flag set to true.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        userId: {
+          type: 'string',
+          description: 'The user ID to delete',
+        },
+        confirm: {
+          type: 'boolean',
+          description: 'Confirmation flag - must be set to true to proceed with deletion',
+        },
+      },
+      required: ['userId', 'confirm'],
     },
   },
   {
@@ -814,7 +882,11 @@ ${errorsText}${warningsText}`,
       }
 
       case 'cloudron_create_user': {
-        const { email, password, role } = args as { email: string; password: string; role: 'admin' | 'user' | 'guest' };
+        const { email, password, role = 'user' } = args as {
+          email: string;
+          password: string;
+          role?: 'admin' | 'user' | 'guest';
+        };
         const user = await cloudron.createUser(email, password, role);
 
         return {
@@ -825,8 +897,95 @@ ${errorsText}${warningsText}`,
   ID: ${user.id}
   Email: ${user.email}
   Username: ${user.username}
+  Display Name: ${user.displayName || 'N/A'}
   Role: ${user.role}
+  Groups: ${user.groups?.length ? user.groups.join(', ') : 'None'}
   Created: ${new Date(user.createdAt).toLocaleString()}`,
+            },
+          ],
+        };
+      }
+
+      case 'cloudron_get_user': {
+        const { userId } = args as { userId: string };
+        const user = await cloudron.getUser(userId);
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `User details:
+  ID: ${user.id}
+  Email: ${user.email}
+  Username: ${user.username}
+  Display Name: ${user.displayName || 'N/A'}
+  Role: ${user.role}
+  Groups: ${user.groups?.length ? user.groups.join(', ') : 'None'}
+  Created: ${new Date(user.createdAt).toLocaleString()}`,
+            },
+          ],
+        };
+      }
+
+      case 'cloudron_update_user': {
+        const { userId, email, displayName, password, role, groups } = args as {
+          userId: string;
+          email?: string;
+          displayName?: string;
+          password?: string;
+          role?: 'admin' | 'user' | 'guest';
+          groups?: string[];
+        };
+        const updates: any = {};
+        if (email) updates.email = email;
+        if (displayName) updates.displayName = displayName;
+        if (password) updates.password = password;
+        if (role) updates.role = role;
+        if (groups) updates.groups = groups;
+
+        const user = await cloudron.updateUser(userId, updates);
+
+        const updatedFields = Object.keys(updates).filter(k => k !== 'password').join(', ');
+        
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `User updated successfully:
+  ID: ${user.id}
+  Email: ${user.email}
+  Username: ${user.username}
+  Display Name: ${user.displayName || 'N/A'}
+  Role: ${user.role}
+  Groups: ${user.groups?.length ? user.groups.join(', ') : 'None'}
+  Updated fields: ${updatedFields || 'password'}`,
+            },
+          ],
+        };
+      }
+
+      case 'cloudron_delete_user': {
+        const { userId, confirm } = args as { userId: string; confirm: boolean };
+        
+        if (!confirm) {
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: 'Error: Confirmation required for user deletion. Set confirm: true to proceed.',
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        await cloudron.deleteUser(userId);
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `User ${userId} deleted successfully.`,
             },
           ],
         };

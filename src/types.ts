@@ -231,8 +231,10 @@ export interface User {
   id: string;
   email: string;
   username: string;
+  displayName?: string;
   role: 'admin' | 'user' | 'guest';
   createdAt: string;
+  groups?: string[];
 }
 
 /**
@@ -240,6 +242,29 @@ export interface User {
  */
 export interface UsersResponse {
   users: User[];
+}
+
+/**
+ * Parameters for creating a new user
+ */
+export interface CreateUserParams {
+  username: string;
+  email: string;
+  displayName: string;
+  password: string;
+  role?: 'admin' | 'user' | 'guest';
+  groups?: string[];
+}
+
+/**
+ * Parameters for updating a user
+ */
+export interface UpdateUserParams {
+  email?: string;
+  displayName?: string;
+  password?: string;
+  role?: 'admin' | 'user' | 'guest';
+  groups?: string[];
 }
 
 /**
