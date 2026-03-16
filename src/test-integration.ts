@@ -114,9 +114,12 @@ async function main(): Promise<void> {
   log(colors.bright, '════════════════════════════════════════');
   console.log();
 
-  // Test 1: Connection validation
+  // Test 1: Connection validation (using getStatus as proxy)
   await runTest('Connection Validation', async () => {
-    await client.validateConnection();
+    const status = await client.getStatus({});
+    if (!status.version) {
+      throw new Error('Cannot connect: status response missing version');
+    }
   });
 
   // Test 2: Get system status
@@ -140,7 +143,7 @@ async function main(): Promise<void> {
       // Show first 3 apps
       const displayApps = apps.slice(0, 3);
       displayApps.forEach((app) => {
-        log(colors.blue, `    - ${app.name} (${app.id}) [${app.status}]`);
+        log(colors.blue, `    - ${app.label || app.appStoreId || 'unknown'} (${app.id}) [${app.runState || app.installationState}]`);
       });
       if (apps.length > 3) {
         log(colors.blue, `    ... and ${apps.length - 3} more`);
@@ -158,14 +161,15 @@ async function main(): Promise<void> {
     }
 
     const targetApp = apps[0];
-    log(colors.yellow, `  ⚠  Attempting to restart: ${targetApp.name} (${targetApp.id})`);
+    const appLabel = targetApp.label || targetApp.appStoreId || 'unknown';
+    log(colors.yellow, `  ⚠  Attempting to restart: ${appLabel} (${targetApp.id})`);
 
     // Safety confirmation - in real test, this would be interactive
     log(colors.yellow, '  Note: In production, this would require confirmation');
 
     try {
-      await client.restartApp({ appId: targetApp.id });
-      log(colors.green, `  Restart initiated for ${targetApp.name}`);
+      await client.restartApp(targetApp.id);
+      log(colors.green, `  Restart initiated for ${appLabel}`);
     } catch (error) {
       // Restart might fail if app is already restarting, which is OK
       if ((error as Error).message.includes('already')) {
