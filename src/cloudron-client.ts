@@ -486,10 +486,57 @@ export class CloudronClient {
       ? `/api/v1/apps/${encodeURIComponent(resourceId)}/logs?lines=${clampedLines}`
       : `/api/v1/services/${encodeURIComponent(resourceId)}/logs?lines=${clampedLines}`;
 
-    const response = await this.makeRequest<LogsResponse>('GET', endpoint);
+    const url = `${this.baseUrl}${endpoint}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT);
 
-    // Parse and format log entries
-    return this.parseLogEntries(response.logs || []);
+    let rawText: string;
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${this.token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        let message = `Cloudron API error: ${response.status} ${response.statusText}`;
+        try {
+          const parsed = JSON.parse(errorBody);
+          if (parsed.message) message = parsed.message;
+        } catch { /* use default */ }
+        throw createErrorFromStatus(response.status, message);
+      }
+
+      rawText = await response.text();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof CloudronError) throw error;
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') throw new CloudronError(`Request timeout after ${DEFAULT_TIMEOUT}ms`, undefined, 'TIMEOUT');
+        throw new CloudronError(`Network error: ${error.message}`, undefined, 'NETWORK_ERROR');
+      }
+      throw new CloudronError('Unknown error occurred');
+    }
+
+    // Support both JSON format ({logs: string[]}) and plain-text (newline-separated)
+    let logLines: string[];
+    try {
+      const data = JSON.parse(rawText) as LogsResponse;
+      // Valid JSON response: use logs array (or empty if not present)
+      logLines = Array.isArray(data.logs) ? data.logs : [];
+    } catch {
+      // Not JSON: treat as plain-text newline-separated log entries
+      logLines = rawText.split('\n').filter(l => l.trim());
+    }
+
+    return this.parseLogEntries(logLines);
   }
 
   /**
