@@ -3,7 +3,7 @@
  * MVP scope: listApps + getApp endpoints
  * DI-enabled for testing
  */
-import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult, Backup, AppStoreApp, User, UpdateUserParams, LogType, LogEntry, AppConfig, ConfigureAppResponse, ManifestValidationResult, InstallAppParams, Domain } from './types.js';
+import type { CloudronClientConfig, App, SystemStatus, TaskStatus, StorageInfo, ValidatableOperation, ValidationResult, Backup, AppStoreApp, User, UpdateUserParams, LogType, LogEntry, AppConfig, ConfigureAppResponse, ManifestValidationResult, InstallAppParams, Domain, Group, Service, UpdateInfo, CloneAppParams } from './types.js';
 export declare class CloudronClient {
     private readonly baseUrl;
     private readonly token;
@@ -220,6 +220,85 @@ export declare class CloudronClient {
      * @returns Validation result with errors and warnings
      */
     validateManifest(appId: string, requiredMB?: number): Promise<ManifestValidationResult>;
+    /**
+     * Check for available Cloudron platform updates
+     * GET /api/v1/cloudron/update
+     * @returns Update information including availability, version, and changelog
+     */
+    checkUpdates(): Promise<UpdateInfo>;
+    /**
+     * Apply available Cloudron platform update (DESTRUCTIVE - services restart)
+     * POST /api/v1/cloudron/update
+     * @returns Task ID for async operation tracking
+     */
+    applyUpdate(): Promise<string>;
+    /**
+     * List all groups on the Cloudron instance
+     * GET /api/v1/groups
+     * @returns Array of groups sorted alphabetically
+     */
+    listGroups(): Promise<Group[]>;
+    /**
+     * Create a new group on the Cloudron instance
+     * POST /api/v1/groups
+     * @param name - Group name (required)
+     * @returns Created group object
+     */
+    createGroup(name: string): Promise<Group>;
+    /**
+     * List all platform infrastructure services (diagnostic read-only)
+     * GET /api/v1/services
+     * @returns Array of service status objects
+     */
+    listServices(): Promise<Service[]>;
+    /**
+     * Create a backup of a specific application
+     * POST /api/v1/apps/:id/backup
+     * @param appId - The app to backup
+     * @returns Task ID for async operation tracking
+     */
+    backupApp(appId: string): Promise<string>;
+    /**
+     * Restore an application from a backup (DESTRUCTIVE - replaces current data)
+     * POST /api/v1/apps/:id/restore
+     * @param appId - The app to restore
+     * @param backupId - The backup to restore from
+     * @returns Task ID for async operation tracking
+     */
+    restoreApp(appId: string, backupId: string): Promise<string>;
+    /**
+     * Clone an application to a new location
+     * POST /api/v1/apps/:id/clone
+     * @param params - Clone parameters (appId, location required; domain, backupId optional)
+     * @returns Task ID for async operation tracking
+     */
+    cloneApp(params: CloneAppParams): Promise<string>;
+    /**
+     * Repair a broken application
+     * POST /api/v1/apps/:id/repair
+     * @param appId - The app to repair
+     * @returns Task ID for async operation tracking
+     */
+    repairApp(appId: string): Promise<string>;
+    /**
+     * Update an application to a newer version
+     * POST /api/v1/apps/:id/update
+     * @param appId - The app to update
+     * @param version - Optional specific version (defaults to latest)
+     * @param force - Force update even if already on same version
+     * @returns Task ID for async operation tracking
+     */
+    updateApp(appId: string, version?: string, force?: boolean): Promise<string>;
+    /**
+     * Fetch real package examples from git.cloudron.io
+     * @param appId - App Store ID (e.g. 'com.electerious.ackee')
+     * @returns Key package files (manifest, Dockerfile, start.sh)
+     */
+    fetchPackageExample(appId: string): Promise<{
+        manifest?: string | undefined;
+        dockerfile?: string | undefined;
+        startScript?: string | undefined;
+    }>;
     /**
      * Install an application from the App Store (F23b with pre-flight validation)
      * POST /api/v1/apps/install

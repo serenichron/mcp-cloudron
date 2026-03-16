@@ -314,3 +314,71 @@ export interface ManifestValidationResult {
   errors: string[];
   warnings: string[];
 }
+
+/**
+ * Group representation from Cloudron group system
+ */
+export interface Group {
+  id: string;
+  name: string;
+  creationTime: string;
+  userCount?: number;
+}
+
+/**
+ * API response wrapper for listing groups
+ */
+export interface GroupsResponse {
+  groups: Group[];
+}
+
+/**
+ * Infrastructure service status from Cloudron
+ */
+export interface Service {
+  name: string;
+  status: 'running' | 'stopped' | 'error' | 'unknown';
+  version?: string;
+  memory?: number;
+  cpu?: number;
+  description?: string;
+}
+
+/**
+ * API response wrapper for listing services
+ */
+export interface ServicesResponse {
+  services: Service[];
+}
+
+/**
+ * Cloudron platform update information
+ */
+export interface UpdateInfo {
+  available: boolean;
+  version?: string;
+  changelog?: string;
+  critical?: boolean;
+  size?: number;
+}
+
+/**
+ * Parameters for cloning an application
+ */
+export interface CloneAppParams {
+  appId: string;
+  location: string;
+  domain?: string | undefined;
+  backupId?: string | undefined;
+  portBindings?: Record<string, number> | undefined;
+}
+
+/**
+ * Package validation result
+ */
+export interface PackageValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+  suggestions: string[];
+}

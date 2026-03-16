@@ -408,9 +408,57 @@ export class CloudronClient {
         const endpoint = type === 'app'
             ? `/api/v1/apps/${encodeURIComponent(resourceId)}/logs?lines=${clampedLines}`
             : `/api/v1/services/${encodeURIComponent(resourceId)}/logs?lines=${clampedLines}`;
-        const response = await this.makeRequest('GET', endpoint);
-        // Parse and format log entries
-        return this.parseLogEntries(response.logs || []);
+        const url = `${this.baseUrl}${endpoint}`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT);
+        let rawText;
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                signal: controller.signal,
+            });
+            clearTimeout(timeoutId);
+            if (!response.ok) {
+                const errorBody = await response.text();
+                let message = `Cloudron API error: ${response.status} ${response.statusText}`;
+                try {
+                    const parsed = JSON.parse(errorBody);
+                    if (parsed.message)
+                        message = parsed.message;
+                }
+                catch { /* use default */ }
+                throw createErrorFromStatus(response.status, message);
+            }
+            rawText = await response.text();
+        }
+        catch (error) {
+            clearTimeout(timeoutId);
+            if (error instanceof CloudronError)
+                throw error;
+            if (error instanceof Error) {
+                if (error.name === 'AbortError')
+                    throw new CloudronError(`Request timeout after ${DEFAULT_TIMEOUT}ms`, undefined, 'TIMEOUT');
+                throw new CloudronError(`Network error: ${error.message}`, undefined, 'NETWORK_ERROR');
+            }
+            throw new CloudronError('Unknown error occurred');
+        }
+        // Support both JSON format ({logs: string[]}) and plain-text (newline-separated)
+        let logLines;
+        try {
+            const data = JSON.parse(rawText);
+            // Valid JSON response: use logs array (or empty if not present)
+            logLines = Array.isArray(data.logs) ? data.logs : [];
+        }
+        catch {
+            // Not JSON: treat as plain-text newline-separated log entries
+            logLines = rawText.split('\n').filter(l => l.trim());
+        }
+        return this.parseLogEntries(logLines);
     }
     /**
      * Parse raw log lines into structured LogEntry objects
@@ -664,6 +712,197 @@ export class CloudronClient {
             result.valid = false;
         }
         return result;
+    }
+    /**
+     * Check for available Cloudron platform updates
+     * GET /api/v1/cloudron/update
+     * @returns Update information including availability, version, and changelog
+     */
+    async checkUpdates() {
+        const response = await this.makeRequest('GET', '/api/v1/cloudron/update');
+        if (!response.update) {
+            return { available: false };
+        }
+        return { ...response.update, available: true };
+    }
+    /**
+     * Apply available Cloudron platform update (DESTRUCTIVE - services restart)
+     * POST /api/v1/cloudron/update
+     * @returns Task ID for async operation tracking
+     */
+    async applyUpdate() {
+        const response = await this.makeRequest('POST', '/api/v1/cloudron/update', {});
+        if (!response.taskId) {
+            throw new CloudronError('Apply update response missing taskId');
+        }
+        return response.taskId;
+    }
+    /**
+     * List all groups on the Cloudron instance
+     * GET /api/v1/groups
+     * @returns Array of groups sorted alphabetically
+     */
+    async listGroups() {
+        const response = await this.makeRequest('GET', '/api/v1/groups');
+        return response.groups ?? [];
+    }
+    /**
+     * Create a new group on the Cloudron instance
+     * POST /api/v1/groups
+     * @param name - Group name (required)
+     * @returns Created group object
+     */
+    async createGroup(name) {
+        if (!name || name.trim().length === 0) {
+            throw new CloudronError('Group name is required');
+        }
+        return this.makeRequest('POST', '/api/v1/groups', { name: name.trim() });
+    }
+    /**
+     * List all platform infrastructure services (diagnostic read-only)
+     * GET /api/v1/services
+     * @returns Array of service status objects
+     */
+    async listServices() {
+        const response = await this.makeRequest('GET', '/api/v1/services');
+        return response.services ?? [];
+    }
+    /**
+     * Create a backup of a specific application
+     * POST /api/v1/apps/:id/backup
+     * @param appId - The app to backup
+     * @returns Task ID for async operation tracking
+     */
+    async backupApp(appId) {
+        if (!appId) {
+            throw new CloudronError('appId is required for app backup');
+        }
+        // Pre-flight storage check
+        await this.checkStorage(5 * 1024); // Require 5GB minimum
+        const response = await this.makeRequest('POST', `/api/v1/apps/${appId}/backup`, {});
+        if (!response.taskId) {
+            throw new CloudronError('App backup response missing taskId');
+        }
+        return response.taskId;
+    }
+    /**
+     * Restore an application from a backup (DESTRUCTIVE - replaces current data)
+     * POST /api/v1/apps/:id/restore
+     * @param appId - The app to restore
+     * @param backupId - The backup to restore from
+     * @returns Task ID for async operation tracking
+     */
+    async restoreApp(appId, backupId) {
+        if (!appId) {
+            throw new CloudronError('appId is required for app restore');
+        }
+        if (!backupId) {
+            throw new CloudronError('backupId is required for app restore');
+        }
+        const response = await this.makeRequest('POST', `/api/v1/apps/${appId}/restore`, { backupId });
+        if (!response.taskId) {
+            throw new CloudronError('App restore response missing taskId');
+        }
+        return response.taskId;
+    }
+    /**
+     * Clone an application to a new location
+     * POST /api/v1/apps/:id/clone
+     * @param params - Clone parameters (appId, location required; domain, backupId optional)
+     * @returns Task ID for async operation tracking
+     */
+    async cloneApp(params) {
+        if (!params.appId) {
+            throw new CloudronError('appId is required for app clone');
+        }
+        if (!params.location) {
+            throw new CloudronError('location (subdomain) is required for app clone');
+        }
+        const body = { location: params.location };
+        if (params.domain)
+            body.domain = params.domain;
+        if (params.backupId)
+            body.backupId = params.backupId;
+        if (params.portBindings)
+            body.portBindings = params.portBindings;
+        const response = await this.makeRequest('POST', `/api/v1/apps/${params.appId}/clone`, body);
+        if (!response.taskId) {
+            throw new CloudronError('App clone response missing taskId');
+        }
+        return response.taskId;
+    }
+    /**
+     * Repair a broken application
+     * POST /api/v1/apps/:id/repair
+     * @param appId - The app to repair
+     * @returns Task ID for async operation tracking
+     */
+    async repairApp(appId) {
+        if (!appId) {
+            throw new CloudronError('appId is required for app repair');
+        }
+        const response = await this.makeRequest('POST', `/api/v1/apps/${appId}/repair`, {});
+        if (!response.taskId) {
+            throw new CloudronError('App repair response missing taskId');
+        }
+        return response.taskId;
+    }
+    /**
+     * Update an application to a newer version
+     * POST /api/v1/apps/:id/update
+     * @param appId - The app to update
+     * @param version - Optional specific version (defaults to latest)
+     * @param force - Force update even if already on same version
+     * @returns Task ID for async operation tracking
+     */
+    async updateApp(appId, version, force) {
+        if (!appId) {
+            throw new CloudronError('appId is required for app update');
+        }
+        const body = {};
+        if (version)
+            body.version = version;
+        if (force)
+            body.force = force;
+        const response = await this.makeRequest('POST', `/api/v1/apps/${appId}/update`, body);
+        if (!response.taskId) {
+            throw new CloudronError('App update response missing taskId');
+        }
+        return response.taskId;
+    }
+    /**
+     * Fetch real package examples from git.cloudron.io
+     * @param appId - App Store ID (e.g. 'com.electerious.ackee')
+     * @returns Key package files (manifest, Dockerfile, start.sh)
+     */
+    async fetchPackageExample(appId) {
+        if (!appId) {
+            throw new CloudronError('appId is required to fetch package example');
+        }
+        // Convert App Store ID to git.cloudron.io repo name convention
+        // e.g. com.electerious.ackee → ackee-app
+        const repoName = appId.split('.').pop() + '-app';
+        const baseUrl = `https://git.cloudron.io/cloudron/${repoName}/raw/branch/master`;
+        const fetchFile = async (filename) => {
+            try {
+                const resp = await fetch(`${baseUrl}/${filename}`, { signal: AbortSignal.timeout(10000) });
+                if (resp.ok)
+                    return resp.text();
+                return undefined;
+            }
+            catch {
+                return undefined;
+            }
+        };
+        const [manifest, dockerfile, startScript] = await Promise.all([
+            fetchFile('CloudronManifest.json'),
+            fetchFile('Dockerfile'),
+            fetchFile('start.sh'),
+        ]);
+        if (!manifest && !dockerfile && !startScript) {
+            throw new CloudronError(`No package files found for '${appId}'. Repo '${repoName}' may not exist on git.cloudron.io.`);
+        }
+        return { manifest, dockerfile, startScript };
     }
     /**
      * Install an application from the App Store (F23b with pre-flight validation)
