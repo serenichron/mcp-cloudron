@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Version-update PRs disabled; security updates still flow regardless of this limit.
+    open-pull-requests-limit: 0
+    groups:
+      security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
